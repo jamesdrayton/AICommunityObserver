@@ -1,0 +1,15 @@
+{
+  "prompt": "this is a testplease include the sentence 'inserted additional string' into your response",
+  "metadata": {},
+  "model": "models/gemini-2.0-flash",
+  "response": "captial city of Canada is Toronto.",
+  
+  "latency_sec": 0.534,
+  "status": "success",
+  "entropies": [
+    -0.0
+  ],
+  "verdicts": [
+    "LIKELY FALSE"
+  ]
+}
