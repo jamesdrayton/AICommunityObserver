@@ -1,0 +1,3 @@
+{"timestamp": 1777085390.9889424, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 15.907003164291382, "metrics": {}}}
+{"timestamp": 1777086875.8498404, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 1.7625291347503662, "metrics": {}}}
+{"timestamp": 1777087051.7769468, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 1.917731761932373, "metrics": {}}}

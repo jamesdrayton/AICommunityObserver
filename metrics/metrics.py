@@ -1,82 +1,67 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.prompts import PromptTemplate
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_core.prompts import ChatPromptTemplate
-from sklearn.metrics.pairwise import cosine_similarity
+
 import numpy as np
+import importlib
+import logging
+import time
 import json
 import csv
 import os
 
-# Set your API key
-api_key = "AIzaSyBMuMocE7WAfi9n__J7e7lZhuh6AqG19o4"
-os.environ["GOOGLE_API_KEY"] = api_key
+from .config import is_metric_enabled
+from .metric_analysis import (
+    initialize_embeddings,
+    analyze_latency_with_llm,
+    generate_prompt_responses
+)
 
-# Initialize Gemini model
-llm_base = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-llm_v2 = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+from .context import MetricContext
 
-embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+try:
+    from env import get_env_variable
+except ImportError:
+    import os
+    get_env_variable = os.getenv
 
-log_history = []
-token_usage_history = [500, 750, 600, 1200]
+logger = logging.getLogger(__name__)
 
-# TODO: modify the metric_template to refer directly to Mlimi Digital benchmarking flags
-metric_template = """
-    You are a specialist in tracking and evaluation the performance of results from prompts
+# Initialize embedding model
+# PROMPT/RESPONSE SIZES SHOULD ALSO BE MEASURED AND PASSED TO METRICS. THIS ALLOWS RELATIVE EFFICACY MEASUREMENTS
+# TODO: Make log file and path customizable
+DEFAULT_LOG_FILE = "metrics_log.jsonl"
+log_history = [] # TODO: Evaluate the purpose of log_history if we save to persistence layer every time
+token_usage_history = [] # e.g. 500, 750, 600, 1200
 
-    You will be given variables such as latency, given in seconds (s). Using this information, you must return whether there is an anomaly or not.
+# -----------------------------
+# Metric Plugin Registry
+# -----------------------------
 
-    You will also be given a history for previous latenciues. This will be used as your reference and comparison point.
+registered_metrics = set({})
 
-    Additionally, you should use your own common knowledge to determine an answer and validate the response to not include any unnecessary information. This is important as there will be times where there is very little information gain from the latency history.
-
-    Give the response as either "Normal" or "Anomaly" and provide reasoning behind the decision and how to improve summarized in 5 bullet points.
-
-    latency: {latency}
-
-    log_history: {log_history}
+def register_metric(name=None):
     """
+    Decorator used to register a metric function.
 
-# Create the chat prompt template
-prompt = ChatPromptTemplate.from_template(metric_template)
+    Metric functions must accept at minimum:
+        (given_prompt, given_response)
+        within a MetricContext object
 
-def evaluate_metrics(id, model, given_prompt, given_response, latency, drift_threshold = 0.85):
-    llm_base = ChatGoogleGenerativeAI(model=model)
-    llm_v2 = ChatGoogleGenerativeAI(model=model)
+    and return a dictionary of results.
 
-    chain_base = prompt | llm_base
-    # chain_v2 = prompt | llm_v2
+    Example:
+        @register_metric(name="example_metric_name")
+        def example_metric(MetricContext context):
+            return {"example_metric": 0.91}
+    """
+    def decorator(func):
+        registered_metrics.add(func)
+        func.metric_name = name or func.__name__
+        registered_metrics.add(func)
+        return func
+    return decorator
 
-    response_base = chain_base.invoke({
-        "latency": latency,
-        # "token_usage": token_usage,
-        "log_history": log_history,
-        # "token_usage_history": token_usage_history
-        }).content
-
-    # chain_base = given_prompt | llm_base
-    # chain_v2 = given_prompt | llm_v2
-
-    result_base = llm_base.invoke(given_prompt).content
-
-    result_v2 = llm_v2.invoke(given_prompt).content
-
-    # Embedding comparison for drift detection
-    vec_base = embedding_model.embed_query(result_base)
-    vec_v2 = embedding_model.embed_query(result_v2)
-    drift = cosine_similarity([vec_base], [vec_v2])[0][0]
-
-    # Determine drift
-    drift_status = "Drift Detected" if drift < drift_threshold else "No Drift"
-
-    print("\n--- Evaluation ---")
-    print(f"Latency: {latency} s")
-    print(f"Response:\n{response_base}")
-    # print(f"Response (Baseline):\n{response_v2}")
-    print(f"Cosine Similarity: {drift:.3f} --> {drift_status}")
-    print("-------------------")
-    # TODO: Record all of the processed metrics and add to json object to give to metrics dashboard (check comments in metrics_dashboard.py)
+# Primary entry for developers using the Observer or Observable middleware.
+# Takes in the prompt, response, latency, and other relevant info and evaluates all registered metrics. Adds to log_history and returns results.
+def evaluate_metrics(id, model, given_prompt, given_response, latency):
 
     info = {
         "id": id,
@@ -84,26 +69,72 @@ def evaluate_metrics(id, model, given_prompt, given_response, latency, drift_thr
         "prompt": given_prompt,
         "response": given_response,
         "latency": latency,
-        "drift": drift,
-        "drift_status": drift_status,
-        "entropy": [],
-        "relevance": 0.0
-        }
-    
-    # print(info)
-    
+        "metrics": {}
+    }
+    context = MetricContext(
+        prompt=given_prompt,
+        response=given_response,
+        latency=latency,
+        model=model
+    )
+
+    # Iterate over metrics in alphabetical order
+    # TODO: Allow order customization
+    for metric_func in registered_metrics:
+
+        metric_name = getattr(metric_func, "metric_name", metric_func.__name__)
+
+        if not is_metric_enabled(metric_name):
+            continue
+
+        try:
+            result = metric_func(
+                context
+            )
+
+            if result is not None:
+                info["metrics"][metric_func.metric_name] = result
+
+        except Exception as e:
+            print(f"Metric plugin failed: {metric_func.__name__} -> {e}")
+
+    # Remove prompt and response from info before saving as metrics. Important for data privacy and storage.
+    info.pop("prompt", None)
+    info.pop("response", None)
+
+    log_history.append(info)
+
+    save_metrics(info) # save the info dict to a persistent database
+
+    return info
+
+# Configurable fn for the dumping the log_history to a database for storage/reading/display to dashboard
+def save_metrics(data, file_path=DEFAULT_LOG_FILE):
+    """Appends log_history to a JSONL file. Each line is a separate JSON object."""
     try:
-        processed_json = json.dumps(info)
-        # print(processed_json)
-    except TypeError as e:
-        print("Serialization error:", e)
+        record = {"timestamp": time.time(),
+                  "data": data}
+        
+        with open(file_path, "a") as f:
+            f.write(json.dumps(record) + "\n")
+    except Exception as e:
+        raise Exception(f"Persistence error: {e}")
 
-    # print(processed_json)
+    return
 
-    log_history.append(latency)
+# TODO: Change to scan subdirectory when tests have been registered.
+# Helper to load ALL files containing measurable tests in this directory.
+def load_metric_plugins():
+    plugins_dir = os.path.dirname(__file__) + "/plugins"
+    # Iterates over and imports all decorated metrics files so they're loaded
+    try:
+        for file in os.listdir(plugins_dir):
+            if file.endswith(".py") and file not in ("metrics.py", "context.py"):
+                module_name = file[:-3]
+                importlib.import_module(f".plugins.{module_name}", package=__package__)
+    except FileNotFoundError as e:
+        raise Exception(f"Error loading metric plugins: {e} \n Consider checking directory pathing.")
+    except Exception as e:
+        raise Exception(f"Error loading metric plugins: {e}")
 
-    return drift
-
-# evaluate_metrics(100, 100)
-# evaluate_metrics(10, 1000)
-# evaluate_metrics(50, 600)
+load_metric_plugins()

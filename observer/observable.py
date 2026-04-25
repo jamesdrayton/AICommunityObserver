@@ -11,11 +11,7 @@ from openai import OpenAI
 from huggingface_hub import login, InferenceClient
 # from unsloth import FastLanguageModel
 
-# TODO 4: Debug metrics
-#from ..metrics.metrics import evaluate_metrics
-
-# Import performance logger for metrics
-from metrics.performance_logger import get_performance_logger
+from metrics.metrics import evaluate_metrics
 
 # Configure logging
 # TODO: Create a threshold of changes for relevance before adding to log to prevent file bloat.
@@ -27,19 +23,6 @@ logging.basicConfig(
 )
 
 # TODO: Assess if it's possible to generate the models list when detecting the model type on class instantiation
-openai_models = ['gpt-4-0613', 'gpt-4', 'gpt-3.5-turbo', 'gpt-5.1-codex-mini', 'gpt-5.1-chat-latest', 'gpt-5.1-2025-11-13', 'gpt-5.1', 'gpt-5.1-codex', 'davinci-002', 'babbage-002', 
-          'gpt-3.5-turbo-instruct', 'gpt-3.5-turbo-instruct-0914', 'dall-e-3', 'dall-e-2', 'gpt-4-1106-preview', 'gpt-3.5-turbo-1106', 'tts-1-hd', 'tts-1-1106', 'tts-1-hd-1106', 
-          'text-embedding-3-small', 'text-embedding-3-large', 'gpt-4-0125-preview', 'gpt-4-turbo-preview', 'gpt-3.5-turbo-0125', 'gpt-4-turbo', 'gpt-4-turbo-2024-04-09', 'gpt-4o', 
-          'gpt-4o-2024-05-13', 'gpt-4o-mini-2024-07-18', 'gpt-4o-mini', 'gpt-4o-2024-08-06', 'chatgpt-4o-latest', 'gpt-4o-audio-preview', 'gpt-4o-realtime-preview', 
-          'omni-moderation-latest', 'omni-moderation-2024-09-26', 'gpt-4o-realtime-preview-2024-12-17', 'gpt-4o-audio-preview-2024-12-17', 'gpt-4o-mini-realtime-preview-2024-12-17', 
-          'gpt-4o-mini-audio-preview-2024-12-17', 'o1-2024-12-17', 'o1', 'gpt-4o-mini-realtime-preview', 'gpt-4o-mini-audio-preview', 'o3-mini', 'o3-mini-2025-01-31', 
-          'gpt-4o-2024-11-20', 'gpt-4o-search-preview-2025-03-11', 'gpt-4o-search-preview', 'gpt-4o-mini-search-preview-2025-03-11', 'gpt-4o-mini-search-preview', 
-          'gpt-4o-transcribe', 'gpt-4o-mini-transcribe', 'o1-pro-2025-03-19', 'o1-pro', 'gpt-4o-mini-tts', 'o3-2025-04-16', 'o4-mini-2025-04-16', 'o3', 'o4-mini', 
-          'gpt-4.1-2025-04-14', 'gpt-4.1', 'gpt-4.1-mini-2025-04-14', 'gpt-4.1-mini', 'gpt-4.1-nano-2025-04-14', 'gpt-4.1-nano', 'gpt-image-1', 'gpt-4o-realtime-preview-2025-06-03', 
-          'gpt-4o-audio-preview-2025-06-03', 'gpt-4o-transcribe-diarize', 'gpt-5-chat-latest', 'gpt-5-2025-08-07', 'gpt-5', 'gpt-5-mini-2025-08-07', 'gpt-5-mini', 
-          'gpt-5-nano-2025-08-07', 'gpt-5-nano', 'gpt-audio-2025-08-28', 'gpt-realtime', 'gpt-realtime-2025-08-28', 'gpt-audio', 'gpt-5-codex', 'gpt-image-1-mini', 
-          'gpt-5-pro-2025-10-06', 'gpt-5-pro', 'gpt-audio-mini', 'gpt-audio-mini-2025-10-06', 'gpt-5-search-api', 'gpt-realtime-mini', 'gpt-realtime-mini-2025-10-06', 
-          'sora-2', 'sora-2-pro', 'gpt-5-search-api-2025-10-14', 'gpt-3.5-turbo-16k', 'tts-1', 'whisper-1', 'text-embedding-ada-002']
 
 # TODO: Reconfigure to work in the api wrapper class instead
 # Helper class to track the token usage for each model
@@ -58,9 +41,9 @@ class UsageTracker:
         """Return current usage stats."""
         return self.usage
 
-class APIWrapper:
+class Observable:
     """
-    Class APIWrapper can be instanced in a module where it is imported such that:
+    Class Observable can be instanced in a module where it is imported such that:
         - The type of model access can be specified for that instance (default API key) if given a key or access token. Options:
             - "api_key" which requires
                 - api_key: str
@@ -76,7 +59,7 @@ class APIWrapper:
     """
     
     # Helper function to detect the available hardware (GPU and vRAM) for init
-    def _detect_hardware():
+    def _detect_hardware(self):
         # TODO: Either automate or move to user config.
         return
 
@@ -93,7 +76,7 @@ class APIWrapper:
             return "gemini"
         
         # Check for OpenAI models
-        if any(openai_model in model_name for openai_model in openai_models):
+        if "gpt" in model_lower:
             return "openai"
         
         # Check for HuggingFace models (format: username/model-name or just model-name)
@@ -105,13 +88,13 @@ class APIWrapper:
     
     # Init will instantiate the instance as usual, and check if all of the necessary parameters are present for the stated access type
     def __init__(self, 
-                 api_key: str = None, token_url: str = None, client_id: str = None, client_secret: str = None, 
+                 api_key: str = "", token_url: str = "", client_id: str = "", client_secret: str = "", 
                  model_name = "gemini-2.0-flash", access_type: str = "api_key", testing_freq: float = 0.1):
         # Immediately checks for errors in given params, continues if all is well.
         if access_type == "api_key" and api_key is None:
-            raise ValueError("Cannot use api_key access without an API key. This APIWrapper instance will not function.")
+            raise ValueError("Cannot use api_key access without an API key. This Observable instance will not function.")
         elif access_type == "api_token" and (token_url is None or client_id is None or client_secret is None):
-            raise ValueError("Cannot use api_token access without all parameters. This APIWrapper instance will not function.")
+            raise ValueError("Cannot use api_token access without all parameters. This Observable instance will not function.")
         
         # Define wrapper access constants
         self.access_type = access_type
@@ -174,29 +157,18 @@ class APIWrapper:
     # TODO: Make work with access_type: api_token as well as access_type: api_key
     # generate is the main point of access for instances of this class
     # generate must take a prompt, and it passes the prompt to the instance's chosen model
-    async def generate(self, prompt: str, max_tokens: int = 256, temperature: float = 0.7,
-                       metadata: dict = None, url: str = None, headers=None, body=None):
-        # Initialize performance logger
-        perf_logger = get_performance_logger()
+    def generate(self, prompt: str, max_tokens: int = 256, temperature: float = 1.0,
+                       metadata: dict = {}, url: str = "", headers=None, body=None):
 
         # Use empty dict if metadata is None (safer than default mutable argument)
         if metadata is None:
             metadata = {}
 
-        # Create base log entry
-        log_entry = perf_logger.create_base_entry(
-            prompt=prompt,
-            model=self.model_name,
-            metadata=metadata
-        )
-
         # Generate unique log ID based on start time
         start_time = time.time()
-        log_id = perf_logger.generate_log_id(start_time)
 
-        # Try making the call to the respective model with their given prompt
-        # TODO: Insert changes to given prompt here as the interception point for metrics, username, region, etc.
-        # TODO: Insert code to log to the database for training data which can be fed back into retraining
+        # ========== Try making the call to the respective model with the given prompt ==========
+        # TODO: Consider abstracting to a helper function for the model call
 
         try:
             # Point of difference for api_key vs api_token access type
@@ -213,10 +185,10 @@ class APIWrapper:
                     response_text = response.text.strip()
 
                 elif self.model_type == "openai":
-                    response = self.model.chat.completions.create(
+                    response = self.model.chat.completions.create( #type: ignore
                         model=self.model_name,
                         messages=[{"role": "user", "content": prompt}],
-                        max_tokens=max_tokens,
+                        max_completion_tokens=max_tokens,
                         temperature=temperature,
                     )
                     response_text = response.choices[0].message.content.strip()
@@ -231,41 +203,27 @@ class APIWrapper:
 
                 else:
                     raise ValueError(f"Unsupported model type: {self.model_type}")
-
-            elif self.access_type == "api_token" and (url is not None and headers is not None and body is not None):
-                # TODO: Troubleshoot this elif, currently it's just there in case someone calls generate() on the wrong instance instead of using the helpers
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(url, headers=headers, json=body)
-                    response.raise_for_status()
-                    return response.json()
             else:
                 raise ValueError("Cannot access the API without url, headers, and body")
 
             duration = time.time() - start_time
 
-            # Log successful call
-            perf_logger.log_success(
-                log_entry=log_entry,
-                response=response_text,
-                latency_sec=duration,
-                log_id=log_id
-            )
-
-            # TODO: Code to call metrics evaluation with the log_id
-            # drift_amount = evaluate_metrics(log_id, self.model_name, prompt, response_text, duration)
-            # TODO: Record the drift amount
-
+            # ========== Call evaluate_metrics to implement the observability aspect ==========
+            # TODO: Configure to:
+            # - Use one single schema for ids
+            # - Only evaluate some percentage of the time with self.testing_freq
+            evaluate_metrics(id=123, model=self.model_name, 
+                             given_prompt=prompt, given_response=response_text, 
+                             latency=duration)
+            
             return response_text
 
         except Exception as e:
             duration = time.time() - start_time
 
-            # Log error call
-            perf_logger.log_error(
-                log_entry=log_entry,
-                error=e,
-                latency_sec=duration,
-                log_id=log_id
-            )
+            evaluate_metrics(id=123, model=self.model_name,
+                             given_prompt=prompt, given_response=f"Failure to reach model within Community Observer. Exception: {e}",
+                             latency=duration)
+            raise Exception(f"Failure to reach model within Community Observer. Exception: {e}")
 
             return None

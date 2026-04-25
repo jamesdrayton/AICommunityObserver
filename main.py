@@ -3,6 +3,7 @@ from flasgger import Swagger
 import os
 
 from testing.testing import testing_bp
+from customization import customization_bp
 
 app = Flask(__name__) 
 swagger = Swagger(app)
@@ -30,8 +31,12 @@ def list_routes():
             "rule": str(rule)
         })
     return {"routes": routes}
-    
-app.register_blueprint(testing_bp)
+
+try:
+    app.register_blueprint(testing_bp)
+except Exception as e:
+    print("The 'testing' dir is missing and will not load")
+app.register_blueprint(customization_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

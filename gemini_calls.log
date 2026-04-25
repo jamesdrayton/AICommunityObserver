@@ -1,0 +1,183 @@
+2026-04-22 22:41:14,595 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-22 22:41:14,595 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-22 22:41:14,596 | INFO |  * Restarting with stat
+2026-04-22 22:41:25,334 | WARNING |  * Debugger is active!
+2026-04-22 22:41:25,335 | INFO |  * Debugger PIN: 856-868-223
+2026-04-22 22:44:04,298 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 22:44:04,341 | INFO | 127.0.0.1 - - [22/Apr/2026 22:44:04] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business? HTTP/1.1" 200 -
+2026-04-22 22:44:14,590 | INFO | 127.0.0.1 - - [22/Apr/2026 22:44:14] "[35m[1mPOST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5.4-nano HTTP/1.1[0m" 500 -
+2026-04-22 22:46:48,880 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-22 22:46:48,880 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-22 22:46:48,882 | INFO |  * Restarting with stat
+2026-04-22 22:46:58,845 | WARNING |  * Debugger is active!
+2026-04-22 22:46:58,846 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 22:47:03,299 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 22:47:03,334 | INFO | 127.0.0.1 - - [22/Apr/2026 22:47:03] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5-nano HTTP/1.1" 200 -
+2026-04-22 22:47:11,309 | INFO | 127.0.0.1 - - [22/Apr/2026 22:47:11] "[35m[1mPOST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5.4-nano HTTP/1.1[0m" 500 -
+2026-04-22 23:31:00,590 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-22 23:31:01,677 | INFO |  * Restarting with stat
+2026-04-22 23:31:05,894 | WARNING |  * Debugger is active!
+2026-04-22 23:31:05,894 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 23:31:09,929 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-22 23:31:10,838 | INFO |  * Restarting with stat
+2026-04-22 23:31:14,734 | WARNING |  * Debugger is active!
+2026-04-22 23:31:14,734 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 23:31:22,595 | INFO | 127.0.0.1 - - [22/Apr/2026 23:31:22] "[35m[1mPOST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5.4-nano HTTP/1.1[0m" 500 -
+2026-04-22 23:31:36,605 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 23:31:36,622 | INFO | 127.0.0.1 - - [22/Apr/2026 23:31:36] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5-nano HTTP/1.1" 200 -
+2026-04-22 23:32:11,347 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-22 23:32:12,340 | INFO |  * Restarting with stat
+2026-04-22 23:32:16,453 | WARNING |  * Debugger is active!
+2026-04-22 23:32:16,454 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 23:33:35,199 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-22 23:33:36,143 | INFO |  * Restarting with stat
+2026-04-22 23:33:40,272 | WARNING |  * Debugger is active!
+2026-04-22 23:33:40,272 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 23:33:48,695 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 23:33:48,727 | INFO | 127.0.0.1 - - [22/Apr/2026 23:33:48] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5-nano HTTP/1.1" 200 -
+2026-04-22 23:34:01,703 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-22 23:34:01,703 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-22 23:34:01,704 | INFO |  * Restarting with stat
+2026-04-22 23:34:05,665 | WARNING |  * Debugger is active!
+2026-04-22 23:34:05,666 | INFO |  * Debugger PIN: 557-099-828
+2026-04-22 23:34:10,826 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 23:34:10,857 | INFO | 127.0.0.1 - - [22/Apr/2026 23:34:10] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5-nano HTTP/1.1" 200 -
+2026-04-22 23:34:22,394 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-22 23:34:22,397 | INFO | 127.0.0.1 - - [22/Apr/2026 23:34:22] "POST /create_openai_message?prompt=What%20tax%20form%20should%20canadians%20use%20to%20declare%20income%20as%20a%20self-employed%20business?&modelName=gpt-5.4-nano HTTP/1.1" 200 -
+2026-04-22 23:36:18,005 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-22 23:36:19,094 | INFO |  * Restarting with stat
+2026-04-24 22:32:34,098 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-24 22:32:34,098 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-24 22:32:34,099 | INFO |  * Restarting with stat
+2026-04-24 22:32:37,879 | WARNING |  * Debugger is active!
+2026-04-24 22:32:37,881 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:34:07,212 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:07] "GET / HTTP/1.1" 200 -
+2026-04-24 22:34:07,302 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-04-24 22:34:11,306 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "GET /apidocs/ HTTP/1.1" 200 -
+2026-04-24 22:34:11,342 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-04-24 22:34:11,343 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-04-24 22:34:11,345 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-04-24 22:34:11,347 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-04-24 22:34:11,550 | INFO | 127.0.0.1 - - [24/Apr/2026 22:34:11] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-04-24 22:34:56,116 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:34:57,194 | INFO |  * Restarting with stat
+2026-04-24 22:35:01,334 | WARNING |  * Debugger is active!
+2026-04-24 22:35:01,334 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:35:01,357 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "GET /apidocs/ HTTP/1.1" 200 -
+2026-04-24 22:35:01,375 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-04-24 22:35:01,376 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-04-24 22:35:01,378 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-04-24 22:35:01,379 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-04-24 22:35:01,598 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:01] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-04-24 22:35:52,220 | INFO | 127.0.0.1 - - [24/Apr/2026 22:35:52] "GET /metrics/available HTTP/1.1" 200 -
+2026-04-24 22:37:09,576 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/customization.py', reloading
+2026-04-24 22:37:10,556 | INFO |  * Restarting with stat
+2026-04-24 22:37:14,580 | WARNING |  * Debugger is active!
+2026-04-24 22:37:14,580 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:38:16,163 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:38:16,975 | INFO |  * Restarting with stat
+2026-04-24 22:38:21,412 | WARNING |  * Debugger is active!
+2026-04-24 22:38:21,412 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:38:22,434 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:38:23,436 | INFO |  * Restarting with stat
+2026-04-24 22:38:27,501 | WARNING |  * Debugger is active!
+2026-04-24 22:38:27,501 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:38:35,575 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:38:36,476 | INFO |  * Restarting with stat
+2026-04-24 22:38:40,453 | WARNING |  * Debugger is active!
+2026-04-24 22:38:40,453 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:39:01,647 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:39:02,641 | INFO |  * Restarting with stat
+2026-04-24 22:39:06,801 | WARNING |  * Debugger is active!
+2026-04-24 22:39:06,802 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:39:24,594 | INFO | 127.0.0.1 - - [24/Apr/2026 22:39:24] "[35m[1mGET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20Slay%20the%20Spire? HTTP/1.1[0m" 500 -
+2026-04-24 22:39:45,156 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:39:46,136 | INFO |  * Restarting with stat
+2026-04-24 22:39:50,690 | WARNING |  * Debugger is active!
+2026-04-24 22:39:50,690 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:40:06,321 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:06] "[35m[1mGET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20Slay%20the%20Spire? HTTP/1.1[0m" 500 -
+2026-04-24 22:40:13,050 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "GET /apidocs/ HTTP/1.1" 200 -
+2026-04-24 22:40:13,091 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-04-24 22:40:13,092 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-04-24 22:40:13,096 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-04-24 22:40:13,102 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-04-24 22:40:13,384 | INFO | 127.0.0.1 - - [24/Apr/2026 22:40:13] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-04-24 22:41:06,214 | INFO | 127.0.0.1 - - [24/Apr/2026 22:41:06] "[35m[1mGET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire? HTTP/1.1[0m" 500 -
+2026-04-24 22:41:37,709 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:41:38,616 | INFO |  * Restarting with stat
+2026-04-24 22:41:43,296 | WARNING |  * Debugger is active!
+2026-04-24 22:41:43,296 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:41:49,355 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:41:50,333 | INFO |  * Restarting with stat
+2026-04-24 22:41:54,727 | WARNING |  * Debugger is active!
+2026-04-24 22:41:54,727 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:42:05,838 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:42:06,827 | INFO |  * Restarting with stat
+2026-04-24 22:42:11,175 | WARNING |  * Debugger is active!
+2026-04-24 22:42:11,175 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:42:16,665 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 22:42:16,699 | INFO | 127.0.0.1 - - [24/Apr/2026 22:42:16] "GET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire? HTTP/1.1" 200 -
+2026-04-24 22:43:06,711 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:43:07,701 | INFO |  * Restarting with stat
+2026-04-24 22:43:12,240 | WARNING |  * Debugger is active!
+2026-04-24 22:43:12,240 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:43:16,274 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/observer/observable.py', reloading
+2026-04-24 22:43:17,115 | INFO |  * Restarting with stat
+2026-04-24 22:43:21,249 | WARNING |  * Debugger is active!
+2026-04-24 22:43:21,249 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:43:22,267 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/observer/observable.py', reloading
+2026-04-24 22:43:23,204 | INFO |  * Restarting with stat
+2026-04-24 22:43:27,220 | WARNING |  * Debugger is active!
+2026-04-24 22:43:27,220 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:43:33,160 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 22:43:33,191 | INFO | 127.0.0.1 - - [24/Apr/2026 22:43:33] "GET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire? HTTP/1.1" 200 -
+2026-04-24 22:44:52,417 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 22:44:52,421 | INFO | 127.0.0.1 - - [24/Apr/2026 22:44:52] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
+2026-04-24 22:45:12,266 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:45:13,375 | INFO |  * Restarting with stat
+2026-04-24 22:45:17,616 | WARNING |  * Debugger is active!
+2026-04-24 22:45:17,616 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:46:46,406 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/observer/observable.py', reloading
+2026-04-24 22:46:47,371 | INFO |  * Restarting with stat
+2026-04-24 22:46:51,605 | WARNING |  * Debugger is active!
+2026-04-24 22:46:51,605 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:46:55,302 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 22:46:55,333 | INFO | 127.0.0.1 - - [24/Apr/2026 22:46:55] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
+2026-04-24 22:48:25,376 | INFO | 127.0.0.1 - - [24/Apr/2026 22:48:25] "[35m[1mGET /create_openai_message?prompt=Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire?&modelName=gpt-5.4-nano HTTP/1.1[0m" 500 -
+2026-04-24 22:49:20,100 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/testing/testing.py', reloading
+2026-04-24 22:49:21,125 | INFO |  * Restarting with stat
+2026-04-24 22:49:25,710 | WARNING |  * Debugger is active!
+2026-04-24 22:49:25,711 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 22:49:50,717 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 22:49:50,986 | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/embedding-001:batchEmbedContents "HTTP/1.1 404 Not Found"
+2026-04-24 22:49:50,990 | INFO | 127.0.0.1 - - [24/Apr/2026 22:49:50] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
+2026-04-24 22:51:42,018 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/observer/observable.py', reloading
+2026-04-24 22:51:43,172 | INFO |  * Restarting with stat
+2026-04-24 22:51:46,892 | WARNING |  * Debugger is active!
+2026-04-24 22:51:46,893 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 23:14:29,394 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-24 23:14:29,394 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-24 23:14:29,394 | INFO |  * Restarting with stat
+2026-04-24 23:14:32,404 | WARNING |  * Debugger is active!
+2026-04-24 23:14:32,405 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 23:14:35,652 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 23:14:35,848 | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/embedding-004:batchEmbedContents "HTTP/1.1 404 Not Found"
+2026-04-24 23:14:35,851 | INFO | 127.0.0.1 - - [24/Apr/2026 23:14:35] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
+2026-04-24 23:17:12,165 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-24 23:17:12,165 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-24 23:17:12,165 | INFO |  * Restarting with stat
+2026-04-24 23:17:15,019 | WARNING |  * Debugger is active!
+2026-04-24 23:17:15,019 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 23:17:17,039 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/metrics/metric_analysis.py', reloading
+2026-04-24 23:17:17,744 | INFO |  * Restarting with stat
+2026-04-24 23:17:20,888 | WARNING |  * Debugger is active!
+2026-04-24 23:17:20,888 | INFO |  * Debugger PIN: 131-574-716
+2026-04-24 23:17:31,579 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-24 23:17:31,774 | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents "HTTP/1.1 429 Too Many Requests"
+2026-04-24 23:17:31,778 | INFO | 127.0.0.1 - - [24/Apr/2026 23:17:31] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
