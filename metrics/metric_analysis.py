@@ -17,6 +17,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 
+from sentence_transformers import SentenceTransformer
 
 # -----------------------------
 # LLM Initialization Utilities
@@ -42,7 +43,7 @@ def initialize_embeddings():
     Returns:
         GoogleGenerativeAIEmbeddings
     """
-    return GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
+    return SentenceTransformer("google/embeddinggemma-300m")
 
 
 # -----------------------------

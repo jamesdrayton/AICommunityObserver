@@ -21,6 +21,8 @@ class MetricContext:
         self,
         prompt: str = "",
         response: str = "",
+        prompt_embedding: list = [],
+        response_embedding: list = [], # TODO: Decide if we want to pass this from init or do it in the background
         latency: float = 999.999,
         model: str = "",
         metadata: Dict[str, Any] = {"Empty": None}
@@ -29,6 +31,10 @@ class MetricContext:
         self.response = response
         self.latency = latency
         self.model = model
+
+        self._embedding_model = None
+        self.prompt_embedding = prompt_embedding or []
+        self.response_embedding = response_embedding or []
 
         # Flexible extension point
         self.metadata = metadata or {}
@@ -58,3 +64,23 @@ class MetricContext:
             },
             "metadata": self.metadata
         }
+    
+    # =============================================== Embedding Model Helpers ===============================================
+
+    def _get_embedding_model(self):
+        if self._embedding_model is None:
+            from metrics.embedding import get_embedding_model
+            self._embedding_model = get_embedding_model()
+        return self._embedding_model
+    
+    def get_prompt_embedding(self):
+        if not self.prompt_embedding and self.prompt:
+            model = self._get_embedding_model()
+            self.prompt_embedding = model.encode_query(self.prompt)
+        return self.prompt_embedding
+    
+    def get_response_embedding(self):
+        if not self.response_embedding and self.response:
+            model = self._get_embedding_model()
+            self.response_embedding = model.encode_query(self.response)
+        return self.response_embedding

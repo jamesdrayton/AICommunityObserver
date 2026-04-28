@@ -1,3 +1,5 @@
 {"timestamp": 1777085390.9889424, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 15.907003164291382, "metrics": {}}}
 {"timestamp": 1777086875.8498404, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 1.7625291347503662, "metrics": {}}}
 {"timestamp": 1777087051.7769468, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 1.917731761932373, "metrics": {}}}
+{"timestamp": 1777136387.1660645, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 4.3961663246154785, "metrics": {}}}
+{"timestamp": 1777136493.575207, "data": {"id": 123, "model": "gpt-5.4-nano", "latency": 3.4594898223876953, "metrics": {"relevance.cosine_similarity": 0.6617943238649384}}}

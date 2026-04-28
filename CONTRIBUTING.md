@@ -2,9 +2,14 @@
 **Numbers correspond with module numbers in README->Structure**
 ## TO-DO:
 
+1. Update MetricContext to include embedding and create embeddings from evaluate_metrics to pass to tests (if case multiple uses for it)
+
 1. Implement basic metrics tests from submodules to log.
+
 1. Refactor test_claim_level_entropy.py
+
 1. Convert GenA11 evaluate_prompts.py into a register-able fn in metrics/
+
 1. Double check and add dockerfile to the git
 
 ================== Past point of MVP ===================

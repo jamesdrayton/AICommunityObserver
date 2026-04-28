@@ -181,3 +181,25 @@
 2026-04-24 23:17:31,579 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-04-24 23:17:31,774 | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents "HTTP/1.1 429 Too Many Requests"
 2026-04-24 23:17:31,778 | INFO | 127.0.0.1 - - [24/Apr/2026 23:17:31] "GET /testpromptopenai/Hi,%20what%20does%20the%20remnant%20do%20in%20slay%20the%20spire%3F HTTP/1.1" 200 -
+2026-04-25 12:58:30,686 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-25 12:58:30,686 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-25 12:58:30,686 | INFO |  * Restarting with stat
+2026-04-25 12:58:33,634 | WARNING |  * Debugger is active!
+2026-04-25 12:58:33,635 | INFO |  * Debugger PIN: 877-703-276
+2026-04-25 12:59:24,118 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "GET /apidocs/ HTTP/1.1" 200 -
+2026-04-25 12:59:24,188 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-04-25 12:59:24,190 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-04-25 12:59:24,191 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-04-25 12:59:24,192 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-04-25 12:59:24,347 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:24] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-04-25 12:59:47,122 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-25 12:59:47,166 | INFO | 127.0.0.1 - - [25/Apr/2026 12:59:47] "GET /create_openai_message?prompt=Hi,%20what%20can%20you%20tell%20me%20about%20the%20watcher%20in%20slay%20the%20spire? HTTP/1.1" 200 -
+2026-04-25 13:01:18,977 | INFO |  * Detected change in '/home/drayton/Programming/AICommunityObserver/metrics/plugins/cosine_similarity.py', reloading
+2026-04-25 13:01:19,746 | INFO |  * Restarting with stat
+2026-04-25 13:01:23,069 | WARNING |  * Debugger is active!
+2026-04-25 13:01:23,069 | INFO |  * Debugger PIN: 877-703-276
+2026-04-25 13:01:30,804 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-04-25 13:01:33,157 | INFO | HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-04-25 13:01:33,567 | INFO | HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-04-25 13:01:33,577 | INFO | 127.0.0.1 - - [25/Apr/2026 13:01:33] "GET /create_openai_message?prompt=Hi,%20what%20can%20you%20tell%20me%20about%20the%20watcher%20in%20slay%20the%20spire? HTTP/1.1" 200 -
