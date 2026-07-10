@@ -4,6 +4,7 @@ import json
 import time
 import httpx
 import logging
+
 import google.generativeai as genai
 
 from openai import OpenAI
@@ -16,11 +17,11 @@ from metrics.metrics import evaluate_metrics
 # Configure logging
 # TODO: Create a threshold of changes for relevance before adding to log to prevent file bloat.
 # Currently logs even when insignificant changes are happening (1 change detected per second)
-logging.basicConfig(
-    filename="gemini_calls.log",
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
-)
+# logging.basicConfig(
+#     filename="gemini_calls.log",
+#     level=logging.INFO,
+#     format="%(asctime)s | %(levelname)s | %(message)s",
+# )
 
 # TODO: Assess if it's possible to generate the models list when detecting the model type on class instantiation
 
@@ -215,7 +216,6 @@ class Observable:
             evaluate_metrics(id=123, model=self.model_name, 
                              given_prompt=prompt, given_response=response_text, 
                              latency=duration)
-            
             return response_text
 
         except Exception as e:

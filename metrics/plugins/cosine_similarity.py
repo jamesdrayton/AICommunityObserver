@@ -2,9 +2,7 @@
 import numpy as np
 
 from sklearn.metrics.pairwise import cosine_similarity
-from env import get_env_variable
 from metrics.metrics import register_metric
-from metrics.metric_analysis import initialize_embeddings
 
 @register_metric(name="relevance.embedding.cosine_similarity")
 def compute_cosine_similarity(context):
@@ -26,8 +24,9 @@ def compute_cosine_similarity(context):
     try:
         vec_prompt = context.get_prompt_embedding()
         vec_response = context.get_response_embedding()
-        similarity = cosine_similarity(vec_prompt.reshape(1, -1), vec_response.reshape(1, -1))[0][0]
-        # similarity = cosine_similarity(np.vstack([vec_prompt, vec_response]))[0][1]
+        # similarity = cosine_similarity(vec_prompt.reshape(1, -1), vec_response.reshape(1, -1))[0][0]
+        similarity = cosine_similarity(np.vstack([vec_prompt, vec_response]))[0][1]
+        print("Cosine similarity: ", float(similarity))
 
         return float(similarity)
     except Exception as e:

@@ -26,14 +26,14 @@ def set_enabled_metrics_endpoint(data=None):
               type: array
               items:
                 type: string
-              examples: ["relevance.cosine_similarity", "toxicity"]
+              examples: ["relevance.embedding.cosine_similarity", "toxicity"]
     responses:
       200:
         description: Set the enabled metrics
         schema:
           type: object
         examples:
-          application/json: {"enabled_metrics": ["relevance", "toxicity"]}
+          application/json: {"enabled_metrics": ["relevance.embedding.cosine_similarity", "toxicity"]}
     """
     data = request.get_json()
     requested = set(data.get("enabled_metrics", []))

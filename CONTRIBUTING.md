@@ -118,3 +118,19 @@ Question:
     - https://www.joneswalker.com/en/insights/blogs/ai-law-blog/governing-ai-that-acts-part-2-control-in-name-only.html
 5. Proposal requires contractors to "identify whether [AI systems used] were modified to comply with non-US or commercial frameworks, and provide documentation tied to compliance, reporting, and use restrictions"
     - https://www.nextgov.com/acquisition/2026/04/trade-and-industry-groups-warn-risks-gsas-draft-ai-procurement-guidance/412614/ 
+
+System Description (LLM-Friendly Context)
+
+AICommunityObserver is a modular observability framework for LLM applications. It is designed to evaluate prompt-response interactions using configurable metrics without requiring changes to existing application logic.
+
+The system introduces an Observable wrapper that replaces or wraps standard model API calls. When a prompt is sent through Observable, it forwards the request to the underlying model provider, captures the response, measures latency, and constructs a MetricContext object containing all relevant data for evaluation.
+
+This context is passed to a metrics engine, which dynamically loads and executes registered metric plugins. Each plugin is a simple function that accepts the context and returns a scalar value. Metrics are namespaced (e.g., relevance.cosine_similarity, latency.value) to allow multiple evaluation strategies to coexist and be compared.
+
+The MetricContext also provides shared resources such as embeddings. These are computed lazily and cached per request, so multiple metrics can reuse them without redundant computation.
+
+Metric execution is controlled through a runtime configuration system exposed via API endpoints. Users can query available metrics and enable or disable specific ones without modifying code.
+
+Results from each evaluation are aggregated into a structured dictionary and written to a JSONL log file. This file serves as the default persistence layer and can be replaced with a custom database if needed.
+
+The framework is intended for both developers and researchers. Developers can integrate it into existing applications to collect performance and quality metrics, while researchers can contribute new evaluation methods as plugins and compare them within a unified system.

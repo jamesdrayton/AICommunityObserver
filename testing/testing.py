@@ -25,14 +25,14 @@ TESTING_FREQ = 0.1 # set so ten percent of all api calls will be tested in depth
 
 # Define all models to be used in this example project using the Observable class
 
-gemini_middleware = Observable(api_key=GEMINI_API_KEY, model_name='gemini-2.0-flash-lite', testing_freq=TESTING_FREQ) if GEMINI_API_KEY else None 
+gemini_middleware = Observable(api_key=GEMINI_API_KEY, model_name='gemini-3.5-flash', testing_freq=TESTING_FREQ) if GEMINI_API_KEY else None 
 openai_middleware = Observable(api_key=OPENAI_API_KEY, model_name="gpt-5.4-nano", testing_freq=TESTING_FREQ) if OPENAI_API_KEY else None
 
 # Models dict is composed of each model name as its keys and a list of the model api key/id in position 0 and the wrapper object in position 1
 models_dict = {
-    "gemini-2.0-flash": gemini_middleware if GEMINI_API_KEY else None, # Removed if api key is empty, 
-    "gpt-5-nano": openai_middleware if OPENAI_API_KEY else None, # Removed if api key is empty
-    } # A dict of the current working models, with name, access, and wrapper
+    "gemini-3.5-flash": gemini_middleware if GEMINI_API_KEY else None, 
+    "gpt-5-nano": openai_middleware if OPENAI_API_KEY else None, 
+}
 
 metadata = {"important_topics": [
     "Write a topic which you want the bot to tell users about",
@@ -177,7 +177,7 @@ def testprompt(userprompt):
 def create_gemini_message(prompt=None):
     """
     Create a new external message calling a Google genai model.
-    Default preparation is using one pre-established wrapper with gemini-2.0-flash
+    Default preparation is using one pre-established wrapper with gemini-3.5-flash
     ---
     tags:
       - Model Calls
