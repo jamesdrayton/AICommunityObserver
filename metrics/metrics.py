@@ -8,11 +8,11 @@ import csv
 import os
 
 from .config import is_metric_enabled
-from .metric_analysis import (
-    initialize_embeddings,
-    analyze_latency_with_llm,
-    generate_prompt_responses
-)
+# from .metric_analysis import (
+#     initialize_embeddings,
+#     analyze_latency_with_llm,
+#     generate_prompt_responses
+# )
 
 from .context import MetricContext
 

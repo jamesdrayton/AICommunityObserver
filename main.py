@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flasgger import Swagger
-import os
 
 from testing.testing import testing_bp
 from customization import customization_bp
@@ -34,8 +33,10 @@ def list_routes():
 
 try:
     app.register_blueprint(testing_bp)
-except Exception as e:
+except FileNotFoundError as e:
     print("The 'testing' dir is missing and will not load")
+except Exception as e:
+    print(f"An error occurred while loading the 'testing' blueprint: {e}")
 app.register_blueprint(customization_bp)
 
 if __name__ == '__main__':

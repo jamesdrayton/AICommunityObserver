@@ -203,3 +203,32 @@
 2026-04-25 13:01:33,157 | INFO | HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2026-04-25 13:01:33,567 | INFO | HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
 2026-04-25 13:01:33,577 | INFO | 127.0.0.1 - - [25/Apr/2026 13:01:33] "GET /create_openai_message?prompt=Hi,%20what%20can%20you%20tell%20me%20about%20the%20watcher%20in%20slay%20the%20spire? HTTP/1.1" 200 -
+2026-04-28 20:07:18,103 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-04-28 20:07:18,103 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-28 20:07:18,104 | INFO |  * Restarting with stat
+2026-04-28 20:07:24,065 | WARNING |  * Debugger is active!
+2026-04-28 20:07:24,067 | INFO |  * Debugger PIN: 861-744-695
+2026-04-28 20:07:24,088 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "GET /apidocs/ HTTP/1.1" 200 -
+2026-04-28 20:07:24,127 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-04-28 20:07:24,128 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-04-28 20:07:24,128 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-04-28 20:07:24,129 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-04-28 20:07:24,553 | INFO | 127.0.0.1 - - [28/Apr/2026 20:07:24] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-05-02 20:23:35,283 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-05-02 20:23:35,284 | INFO | [33mPress CTRL+C to quit[0m
+2026-05-02 20:23:35,284 | INFO |  * Restarting with stat
+2026-05-02 20:23:41,049 | WARNING |  * Debugger is active!
+2026-05-02 20:23:41,051 | INFO |  * Debugger PIN: 768-535-603
+2026-05-02 20:23:41,073 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /apidocs/ HTTP/1.1" 200 -
+2026-05-02 20:23:41,097 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /flasgger_static/swagger-ui.css HTTP/1.1" 200 -
+2026-05-02 20:23:41,099 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /flasgger_static/swagger-ui-bundle.js HTTP/1.1" 200 -
+2026-05-02 20:23:41,099 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1" 200 -
+2026-05-02 20:23:41,100 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /flasgger_static/lib/jquery.min.js HTTP/1.1" 200 -
+2026-05-02 20:23:41,243 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /flasgger_static/favicon-32x32.png HTTP/1.1" 200 -
+2026-05-02 20:23:41,275 | INFO | 127.0.0.1 - - [02/May/2026 20:23:41] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-07-08 14:52:06,027 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+2026-07-08 14:52:06,028 | INFO | [33mPress CTRL+C to quit[0m
+2026-07-08 14:52:06,028 | INFO |  * Restarting with stat

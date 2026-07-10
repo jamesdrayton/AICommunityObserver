@@ -1,6 +1,6 @@
 # AICommunityObserver
-Centralized AI operations platform, offering unified monitoring, alerting, security and accessibility management for all GenAI assets.
 
+AICommunityObserver is a middleware observability layer for all GenAI applications. It sits between your application and model calls, automatically collecting and evaluating inputs without changing how you generate or store prompt and response history. Just include the AICommunityObserver in your application and access the Observer or Observable objects to make your API calls, and centralize all of your AI operations to allow unified monitoring, alerting, security, and accessibility management for all GenAI assets within your application.
 
 Code of Conduct for the Community Contributors - https://acrobat.adobe.com/link/track?uri=urn:aaid:scds:US:1cb574fd-0e7e-440e-baf9-2f835c3ab602
 
@@ -24,6 +24,26 @@ benchmarks/
     corruption/
         mining/
         agriculture/
+
+## How to Use
+
+
+## Execution Flow
+User / Application
+        ↓
+Observable (API Wrapper)
+        ↓
+LLM Provider (OpenAI / Gemini / etc.)
+        ↓
+MetricContext (standardized data object)
+        ↓
+metrics.evaluate_metrics()
+        ↓
+Metric Plugins (registry-based execution)
+        ↓
+Persistence (JSONL → your DB)
+        ↓
+Dashboard / Analysis
 
 Current Community Contributors to this Repo : 
 

@@ -1,4 +1,7 @@
 Submodules
 env.py
 metrics_logs.jsonl
+performance_metrics.log
+./logs/*
 ./metrics/performance_logger.py
+./metrics/metric_analysis.py
