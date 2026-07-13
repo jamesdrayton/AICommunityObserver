@@ -13,7 +13,7 @@ from openai import OpenAI
 from huggingface_hub import login, InferenceClient
 # from unsloth import FastLanguageModel
 
-from metrics.metrics import evaluate_metrics
+from ..metrics import evaluate_metrics
 
 # Configure logging
 # TODO: Create a threshold of changes for relevance before adding to log to prevent file bloat.

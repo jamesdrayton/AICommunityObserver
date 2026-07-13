@@ -27,6 +27,10 @@ benchmarks/
 
 ## How to Use
 
+run 'fastapi dev' in the main branch
+
+run 'python -m main' in the Flask branch
+
 ## Execution Flow
 User / Application
         ↓

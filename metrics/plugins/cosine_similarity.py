@@ -2,7 +2,7 @@
 import numpy as np
 
 from sklearn.metrics.pairwise import cosine_similarity
-from metrics.metrics import register_metric
+from ..metrics import register_metric
 
 @register_metric(name="relevance.embedding.cosine_similarity")
 def compute_cosine_similarity(context):

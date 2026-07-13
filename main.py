@@ -1,43 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flasgger import Swagger
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from testing.testing import testing_bp
-from customization import customization_bp
+from .testing import testing
+from . import customization
 
-app = Flask(__name__) 
-swagger = Swagger(app)
-
-@app.route('/swagger')
-def swagger():
-    """
-    A simple index endpoint
-    ---
-    responses:
-      200:
-        description: Returns a welcome message
-        examples:
-          application/json: { "message": "Welcome to the API!" }
-    """
-    return jsonify(message="Welcome to the API!")
-
-@app.route("/routes")
-def list_routes():
-    routes = []
-    for rule in app.url_map.iter_rules():
-        routes.append({
-            "endpoint": rule.endpoint,
-            "methods": list(rule.methods),
-            "rule": str(rule)
-        })
-    return {"routes": routes}
+app = FastAPI()  
 
 try:
-    app.register_blueprint(testing_bp)
+    app.include_router(testing.router, prefix="/testing")
 except FileNotFoundError as e:
     print("The 'testing' dir is missing and will not load")
 except Exception as e:
     print(f"An error occurred while loading the 'testing' blueprint: {e}")
-app.register_blueprint(customization_bp)
-
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)

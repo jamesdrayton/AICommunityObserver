@@ -1,13 +1,13 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter
 
-from metrics.context import MetricContext
-from metrics.metrics import registered_metrics
-from metrics.config import get_enabled_metrics, set_enabled_metrics
+# from .metrics.context import MetricContext
+from .metrics import MetricContext, registered_metrics, get_enabled_metrics, set_enabled_metrics
+# from metrics.config import get_enabled_metrics, set_enabled_metrics
 
-customization_bp = Blueprint('customization', __name__)
+customization_router = APIRouter()
 
 # ============================ Customization SET Endpoints ============================
-@customization_bp.route('/metrics/enabled', methods=['POST'])
+@customization_router.post('/metrics/enabled', tags=["Customization"])
 def set_enabled_metrics_endpoint(data=None):
     """
     Set the enabled metrics by name.
@@ -35,7 +35,6 @@ def set_enabled_metrics_endpoint(data=None):
         examples:
           application/json: {"enabled_metrics": ["relevance.embedding.cosine_similarity", "toxicity"]}
     """
-    data = request.get_json()
     requested = set(data.get("enabled_metrics", []))
 
     available = {
@@ -44,7 +43,7 @@ def set_enabled_metrics_endpoint(data=None):
     invalid = requested - available
 
     if invalid:
-        return jsonify({
+        return ({
             "error": f"Invalid metric names: {invalid}",
             "available_metrics": list(available)
         }), 400
@@ -54,11 +53,11 @@ def set_enabled_metrics_endpoint(data=None):
     return {"enabled_metrics": list(requested)}
 
 # ============================ Customization GET Endpoints ============================
-@customization_bp.route('/metrics/enabled', methods=['GET'])
+@customization_router.get('/metrics/enabled', tags=["Customization"])
 def get_enabled_metrics_endpoint():
     return {"enabled_metrics": list(get_enabled_metrics())}
 
-@customization_bp.route('/metrics/schema', methods=['GET'])
+@customization_router.get('/metrics/schema', tags=["Customization"])
 def get_metrics_schema():
     """
     Get the current schema for metrics recording and storage. 
@@ -86,7 +85,7 @@ def get_metrics_schema():
         "fields": MetricContext.schema()
     }
 
-@customization_bp.route('/metrics/available', methods=['GET'])
+@customization_router.get('/metrics/available', tags=["Customization"])
 def get_metrics_available():
     """
     Get all registered metric names. Use to avoid namespacing conflicts when setting.
@@ -108,7 +107,7 @@ def get_metrics_available():
         "available_metrics": metric_names
     }
 
-@customization_bp.route('/metrics/plugins', methods=['GET'])
+@customization_router.get('/metrics/plugins', tags=["Customization"])
 def get_metrics_plugins():
     """
     Get all registered metric plugin functions.
