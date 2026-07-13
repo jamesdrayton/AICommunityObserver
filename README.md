@@ -27,6 +27,8 @@ benchmarks/
 
 ## How to Use
 
+run 'python -m main'
+
 ## Execution Flow
 User / Application
         ↓
