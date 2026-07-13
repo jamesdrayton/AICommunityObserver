@@ -5,7 +5,8 @@ import time
 import httpx
 import logging
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from openai import OpenAI
 
@@ -54,7 +55,7 @@ class Observable:
                 - client_id: str
                 - client_secret: str
                 - For: Custom API endpoints
-        - The name of the model (default gemini-2.0-flash). Current options: Google Gemini, OpenAI, HuggingFace model IDs.
+        - The name of the model (default gemini-3.5-flash). Current options: Google Gemini, OpenAI, HuggingFace model IDs.
 
     and the generate function can be called on that instance such that it will prompt the defined model in that instance with a given str
     """
@@ -64,6 +65,7 @@ class Observable:
         # TODO: Either automate or move to user config.
         return
 
+    # Note: Borderline deprecated
     # Helper function to detect model type. Consider deleting and moving to user config.
     def _detect_model_type(self, model_name: str, api_key: str) -> str:
         """
@@ -88,9 +90,11 @@ class Observable:
         return "huggingface"
     
     # Init will instantiate the instance as usual, and check if all of the necessary parameters are present for the stated access type
-    def __init__(self, 
-                 api_key: str = "", token_url: str = "", client_id: str = "", client_secret: str = "", 
-                 model_name = "gemini-2.0-flash", access_type: str = "api_key", testing_freq: float = 0.1):
+    def __init__(self, model_type: str = "gemini", model_name: str = "gemini-3.5-flash", # Basic essential parameters
+                 api_key: str = "", access_type: str = "api_key",                        # API key access parameters
+                 token_url: str = "", client_id: str = "", client_secret: str = "",      # API token access parameters
+                 testing_freq: float = 0.1, provider_options: dict = {},                 # User customization options
+                 ):
         # Immediately checks for errors in given params, continues if all is well.
         if access_type == "api_key" and api_key is None:
             raise ValueError("Cannot use api_key access without an API key. This Observable instance will not function.")
@@ -99,6 +103,7 @@ class Observable:
         
         # Define wrapper access constants
         self.access_type = access_type
+        self.model_type = model_type
         self.model_name = model_name
         self.api_key = api_key
         self.SCOPE = "api"
@@ -106,17 +111,31 @@ class Observable:
 
         # Define wrapper configuration constants
         self.testing_freq = testing_freq # TODO: Implement testing frequency
+
+        # provider_options_example={
+        #     "client": {
+        #         "enterprise": True,
+        #         "project": "...",
+        #         "location": "...",
+        #     },
+        #     "generate": {
+        #         "temperature": 0.8,
+        #         "top_p": 0.95,
+        #     }
+        # }
+        if not isinstance(provider_options, dict):
+            raise TypeError("provider_options must be a dictionary if provided.")
+        self.provider_options = provider_options or {"client": {}, "generate": {}}
         
         if access_type == "api_key":
             # Detect model type and initialize accordingly
-            self.model_type = self._detect_model_type(model_name, api_key)
-            
+            client_kwargs = self.provider_options.get("client", {})
             if self.model_type == "gemini":
                 # Google Gemini
-                genai.configure(api_key=api_key)
-                self.model = genai.GenerativeModel(model_name=model_name,
-                                                generation_config={"response_mime_type": "text/plain"}
-                                                )
+                self.model = genai.Client(
+                    api_key=api_key,
+                    **client_kwargs
+                    )
             elif self.model_type == "openai":
                 # OpenAI
                 self.model = OpenAI(api_key=api_key)
@@ -174,14 +193,17 @@ class Observable:
         try:
             # Point of difference for api_key vs api_token access type
             if self.access_type == "api_key":
+                generate_kwargs = self.provider_options.get("generate", {})
                 # Handle different model types
                 if self.model_type == "gemini":
-                    response = self.model.generate_content(
-                        prompt,
-                        generation_config={
-                            "max_output_tokens": max_tokens,
-                            "temperature": temperature,
-                        }
+                    response = self.model.models.generate_content(
+                        model=self.model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            **generate_kwargs,
+                            temperature=temperature,
+                            max_output_tokens=max_tokens,
+                        )
                     )
                     response_text = response.text.strip()
 
@@ -189,16 +211,16 @@ class Observable:
                     response = self.model.chat.completions.create( #type: ignore
                         model=self.model_name,
                         messages=[{"role": "user", "content": prompt}],
-                        max_completion_tokens=max_tokens,
+                        **generate_kwargs,
                         temperature=temperature,
+                        max_completion_tokens=max_tokens,
                     )
                     response_text = response.choices[0].message.content.strip()
 
                 elif self.model_type == "huggingface":
                     response = self.model.text_generation(
                         prompt,
-                        max_new_tokens=max_tokens,
-                        temperature=temperature,
+                        **generate_kwargs
                     )
                     response_text = response.strip()
 

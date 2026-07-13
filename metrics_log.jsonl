@@ -8,3 +8,4 @@
 {"timestamp": 1783677793.4977481, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 32.662469148635864, "metrics": {}}}
 {"timestamp": 1783677962.9174092, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 61.56014394760132, "metrics": {"relevance.embedding.cosine_similarity": 0.8658059097883588}}}
 {"timestamp": 1783678104.7419116, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 5.4773173332214355, "metrics": {"relevance.embedding.cosine_similarity": 0.8844372368840303}}}
+{"timestamp": 1783934192.8567114, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 18.390370845794678, "metrics": {"relevance.embedding.cosine_similarity": 0.8717203598295538}}}

@@ -2,15 +2,9 @@ from flask import Blueprint, request, jsonify
 from observer import Observable
 from env import get_env_variable
 
-import google.generativeai as genai
-from openai import OpenAI
-
 import asyncio
-import os
-import re
 import time
 import random
-import json
 import pandas as pd
 
 testing_bp = Blueprint('testing', __name__)

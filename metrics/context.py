@@ -73,6 +73,14 @@ class MetricContext:
             self.client = genai.Client()
         return self.client
     
+    def _close_client(self):
+        if self.client is not None:
+            self.client.close()
+            self.client = None
+            return True
+        print("No client to close.")
+        return False
+    
     # Note: These vary with content configs. Current embedding caching is within a dict referred to by (model, task_type)
     def get_prompt_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
         key = (model, task_type)

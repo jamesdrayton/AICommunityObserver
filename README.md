@@ -27,7 +27,6 @@ benchmarks/
 
 ## How to Use
 
-
 ## Execution Flow
 User / Application
         ↓
