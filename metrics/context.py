@@ -7,7 +7,9 @@ into metric plugins.
 This acts as the canonical schema for all metric inputs.
 """
 
-from typing import Any, Dict
+from collections.abc import Callable
+
+from typing import Any, Dict, Optional
 from google import genai
 from google.genai import types
 
@@ -16,24 +18,30 @@ class MetricContext:
     Container for all inputs to metric evaluation.
 
     This object is passed to all registered metric plugins.
+
+    It is also optionally accessible to the user.
     """
 
     def __init__(
         self,
         prompt: str = "",
         response: str = "",
-        prompt_embeddings: dict = {},
-        response_embeddings: dict = {}, # TODO: Decide if we want to pass this from init or do it in the background
+        prompt_embeddings: dict | None = None,
+        response_embeddings: dict | None = None,
         latency: float = 999.999,
+        tokens_used: int = 999999,
         model: str = "",
-        metadata: Dict[str, Any] = {"Empty": None}
+        embed_provider: Optional[Callable[..., Any]] = None,
+        metadata: Dict[str, Any] | None = None
     ):
         self.prompt = prompt
         self.response = response
         self.latency = latency
+        self.tokens_used = tokens_used
         self.model = model
 
         self.client = None
+        self.embed_provider = embed_provider
         self.prompt_embeddings = prompt_embeddings or {}
         self.response_embeddings = response_embeddings or {}
 
@@ -47,7 +55,8 @@ class MetricContext:
             "response": "string",
             "model": "string",
             "metrics": {
-                "latency": "float"
+                "latency": "float",
+                "tokens_used": "int",
             },
             "metadata": "object"
         }
@@ -61,47 +70,31 @@ class MetricContext:
             "response": self.response,
             "model": self.model,
             "metrics": {
-                "latency": self.latency
+                "latency": self.latency,
+                "tokens_used": self.tokens_used
             },
             "metadata": self.metadata
         }
     
     # =============================================== Embedding Model Helpers ===============================================
-
-    def _get_client(self):
-        if self.client is None:
-            self.client = genai.Client()
-        return self.client
-    
-    def _close_client(self):
-        if self.client is not None:
-            self.client.close()
-            self.client = None
-            return True
-        print("No client to close.")
-        return False
     
     # Note: These vary with content configs. Current embedding caching is within a dict referred to by (model, task_type)
     def get_prompt_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
         key = (model, task_type)
         if key not in self.prompt_embeddings and self.prompt:
-            client = self._get_client()
-            result = client.models.embed_content(
-                model=model,
-                contents=self.prompt,
-                config=types.EmbedContentConfig(task_type=task_type)
+            self.prompt_embeddings[key] = self.embed_provider(
+                self.prompt,
+                task_type=task_type,
+                model=model
             )
-            self.prompt_embeddings[key] = result.embeddings[0].values
         return self.prompt_embeddings[key]
     
     def get_response_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
         key = (model, task_type)
         if key not in self.response_embeddings and self.response:
-            client = self._get_client()
-            result = client.models.embed_content(
-                model=model,
-                contents=self.response,
-                config=types.EmbedContentConfig(task_type=task_type)
+            self.response_embeddings[key] = self.embed_provider(
+                self.response,
+                task_type=task_type,
+                model=model
             )
-            self.response_embeddings[key] = result.embeddings[0].values
         return self.response_embeddings[key]

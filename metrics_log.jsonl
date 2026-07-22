@@ -1,11 +1,1 @@
-{"timestamp": 1783600596.8917105, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 2.1631174087524414, "metrics": {}}}
-{"timestamp": 1783600794.8921301, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 1.093919038772583, "metrics": {}}}
-{"timestamp": 1783601697.9358344, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 267.85842275619507, "metrics": {}}}
-{"timestamp": 1783603243.5239682, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 13.026542663574219, "metrics": {}}}
-{"timestamp": 1783603338.493039, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 6.372741460800171, "metrics": {}}}
-{"timestamp": 1783603364.7681522, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 4.6504669189453125, "metrics": {}}}
-{"timestamp": 1783677593.1451437, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 11.34121298789978, "metrics": {}}}
-{"timestamp": 1783677793.4977481, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 32.662469148635864, "metrics": {}}}
-{"timestamp": 1783677962.9174092, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 61.56014394760132, "metrics": {"relevance.embedding.cosine_similarity": 0.8658059097883588}}}
-{"timestamp": 1783678104.7419116, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 5.4773173332214355, "metrics": {"relevance.embedding.cosine_similarity": 0.8844372368840303}}}
-{"timestamp": 1783934192.8567114, "data": {"id": 123, "model": "gemini-3.5-flash", "latency": 18.390370845794678, "metrics": {"relevance.embedding.cosine_similarity": 0.8717203598295538}}}
+{"timestamp": 1784030802.9074867, "data": {"id": 123, "model": "gemini-3.5-flash", "metadata": {"latency": 9.203631162643433, "tokens_used": 264}, "metrics": {"relevance.embedding.cosine_similarity": 0.8681352374757438}}}

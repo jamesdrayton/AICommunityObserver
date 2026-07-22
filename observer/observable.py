@@ -13,7 +13,7 @@ from openai import OpenAI
 from huggingface_hub import login, InferenceClient
 # from unsloth import FastLanguageModel
 
-from ..metrics import evaluate_metrics
+from ..metrics import evaluate_metrics, MetricContext
 
 # Configure logging
 # TODO: Create a threshold of changes for relevance before adding to log to prevent file bloat.
@@ -26,7 +26,6 @@ from ..metrics import evaluate_metrics
 
 # TODO: Assess if it's possible to generate the models list when detecting the model type on class instantiation
 
-# TODO: Reconfigure to work in the api wrapper class instead
 # Helper class to track the token usage for each model
 class UsageTracker:
     def __init__(self):
@@ -105,6 +104,7 @@ class Observable:
         self.access_type = access_type
         self.model_type = model_type
         self.model_name = model_name
+        self.embedding_model = "gemini-embedding-001" # TODO: Choose embedding model with a function
         self.api_key = api_key
         self.SCOPE = "api"
         self.token_cache = {"access_token": None, "expires_at": 0}
@@ -175,10 +175,12 @@ class Observable:
             return token_cache["access_token"]
         
     # TODO: Make work with access_type: api_token as well as access_type: api_key
+    # TODO: Configure for batch generation
     # generate is the main point of access for instances of this class
     # generate must take a prompt, and it passes the prompt to the instance's chosen model
-    def generate(self, prompt: str, max_tokens: int = 256, temperature: float = 1.0,
-                       metadata: dict = {}, url: str = "", headers=None, body=None):
+    def generate(self, prompt: str | list, max_tokens: int = 256, temperature: float = 1.0,
+                       metadata: dict = {}, url: str = "", headers=None, body=None,
+                       return_context: bool = False):
 
         # Use empty dict if metadata is None (safer than default mutable argument)
         if metadata is None:
@@ -188,8 +190,6 @@ class Observable:
         start_time = time.time()
 
         # ========== Try making the call to the respective model with the given prompt ==========
-        # TODO: Consider abstracting to a helper function for the model call
-
         try:
             # Point of difference for api_key vs api_token access type
             if self.access_type == "api_key":
@@ -231,13 +231,25 @@ class Observable:
 
             duration = time.time() - start_time
 
+            metadata["latency"] = duration
+            metadata["tokens_used"] = response.usage_metadata.total_token_count if hasattr(response, "usage_metadata") else 999999 # Flag for missing token usage data
+            metadata["embedding_model"] = self.embedding_model
+
             # ========== Call evaluate_metrics to implement the observability aspect ==========
             # TODO: Configure to:
             # - Use one single schema for ids
             # - Only evaluate some percentage of the time with self.testing_freq
-            evaluate_metrics(id=123, model=self.model_name, 
-                             given_prompt=prompt, given_response=response_text, 
-                             latency=duration)
+            context = MetricContext(
+                prompt=prompt,
+                response=response_text,
+                latency=duration,
+                tokens_used=metadata["tokens_used"],
+                model=self.model_name,
+                embed_provider=self.embed
+            )
+            evaluate_metrics(id=123, context=context, metadata=metadata)
+            if return_context:
+                return response_text, context
             return response_text
 
         except Exception as e:
@@ -245,7 +257,39 @@ class Observable:
 
             evaluate_metrics(id=123, model=self.model_name,
                              given_prompt=prompt, given_response=f"Failure to reach model within Community Observer. Exception: {e}",
-                             latency=duration)
+                             metadata=metadata)
             raise Exception(f"Failure to reach model within Community Observer. Exception: {e}")
 
             return None
+    
+    # TODO: Configure for batch embedding
+    # embed is a general purpose embedding function which will adjust to chosen embedding models according to the defined observable model
+    # embed must take text (to perform the embedding on) and returns a vector
+    def embed(self, text: str | list, task_type: str = "SEMANTIC_SIMILARITY", embedding_model: str = "gemini-embedding-001"):
+        # TODO: Configure for different model types (currently all gemini free)
+        try:
+            if self.model is None:
+                self.model = genai.Client()
+            result = self.model.models.embed_content(
+                model=embedding_model,
+                contents=text,
+                config=types.EmbedContentConfig(task_type=task_type)
+            )
+            return result.embeddings[0].values
+        except Exception as e:
+            raise Exception(f"Failure to embed: {e}")
+        
+    # Helper functions to get prompt and response embeddings either through caching or generating a new embedding
+    def _get_prompt_embedding(self, context: MetricContext, task_type: str = "SEMANTIC_SIMILARITY", embedding_model: str = "gemini-embedding-001"):
+        key = (embedding_model, task_type)
+        if key not in context.prompt_embeddings and context.prompt:
+            context.prompt_embeddings[key] = self.embed(text=context.prompt, task_type=task_type, embedding_model=embedding_model)
+            return context.prompt_embeddings[key]
+        return None
+    
+    def _get_response_embedding(self, context: MetricContext, task_type: str = "SEMANTIC_SIMILARITY", embedding_model: str = "gemini-embedding-001"):
+        key = (embedding_model, task_type)
+        if key not in context.response_embeddings and context.response:
+            context.response_embeddings[key] = self.embed(text=context.response, task_type=task_type, embedding_model=embedding_model)
+            return context.response_embeddings[key]
+        return None

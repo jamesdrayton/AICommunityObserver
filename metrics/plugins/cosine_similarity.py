@@ -22,7 +22,8 @@ def compute_cosine_similarity(context):
         return None
 
     try:
-        vec_prompt = context.get_prompt_embedding()
+        key = (context.embedding_model, "SEMANTIC_SIMILARITY")
+        vec_prompt = context.get_prompt_embedding() 
         vec_response = context.get_response_embedding()
         # similarity = cosine_similarity(vec_prompt.reshape(1, -1), vec_response.reshape(1, -1))[0][0]
         similarity = cosine_similarity(np.vstack([vec_prompt, vec_response]))[0][1]

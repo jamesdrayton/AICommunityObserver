@@ -8,24 +8,11 @@ import csv
 import os
 
 from .config import is_metric_enabled
-# from .metric_analysis import (
-#     initialize_embeddings,
-#     analyze_latency_with_llm,
-#     generate_prompt_responses
-# )
 
 from .context import MetricContext
 
-try:
-    from env import get_env_variable
-except ImportError:
-    import os
-    get_env_variable = os.getenv
-
 logger = logging.getLogger(__name__)
 
-# Initialize embedding model
-# PROMPT/RESPONSE SIZES SHOULD ALSO BE MEASURED AND PASSED TO METRICS. THIS ALLOWS RELATIVE EFFICACY MEASUREMENTS
 # TODO: Make log file and path customizable
 DEFAULT_LOG_FILE = "metrics_log.jsonl"
 log_history = [] # TODO: Evaluate the purpose of log_history if we save to persistence layer every time
@@ -34,6 +21,9 @@ token_usage_history = [] # e.g. 500, 750, 600, 1200
 # -----------------------------
 # Metric Plugin Registry
 # -----------------------------
+# Metric plugin namespaces take the form of "category.requirements.name"
+# So a plugin which measures prompt-response similarity and requires embeddings will have its name preceded by relevance.embedding
+# TODO: Alter registry to govern namespaces (e.g. if a plugin accesses context embeddings, verify .embedding is requirements)
 
 registered_metrics = set({})
 
@@ -61,22 +51,16 @@ def register_metric(name=None):
 
 # Primary entry for developers using the Observer or Observable middleware.
 # Takes in the prompt, response, latency, and other relevant info and evaluates all registered metrics. Adds to log_history and returns results.
-def evaluate_metrics(id, model, given_prompt, given_response, latency):
+def evaluate_metrics(id: int, context: MetricContext, metadata: dict):
 
     info = {
         "id": id,
-        "model": model,
-        "prompt": given_prompt,
-        "response": given_response,
-        "latency": latency,
+        "model": context.model,
+        "prompt": context.prompt,
+        "response": context.response,
+        "metadata": metadata,
         "metrics": {}
     }
-    context = MetricContext(
-        prompt=given_prompt,
-        response=given_response,
-        latency=latency,
-        model=model
-    )
 
     # Iterate over metrics in alphabetical order
     # TODO: Allow order customization
@@ -105,7 +89,6 @@ def evaluate_metrics(id, model, given_prompt, given_response, latency):
     log_history.append(info)
 
     save_metrics(info) # save the info dict to a persistent database
-
     return info
 
 # Configurable fn for the dumping the log_history to a database for storage/reading/display to dashboard

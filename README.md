@@ -25,6 +25,40 @@ benchmarks/
         mining/
         agriculture/
 
+- main.py (from .testing import testing  and from . import customization)
+
+- env.py (no internal imports)
+
+- customization.py (from .metrics import MetricContext, registered_metrics, get_enabled_metrics, set_enabled_metrics )
+
+- __init__.py (empty)
+
+- /testing
+
+-- __init__.py (from .testing import testing)
+
+-- testing.py ( from ..observer import Observable and from ..env import get_env_variable- /observer
+
+- /metrics
+
+-- __init__.py (from .metrics import evaluate_metrics, register_metric, registered_metrics , from .context import MetricContext, and from .config import get_enabled_metrics, set_enabled_metrics)
+
+-- metrics.py (from .context import MetricContext and from .config import is_metric_enabled) 
+
+-- context.py
+
+-- config.py
+
+-- /plugins
+
+--- various py files all with same import (from ..metrics import register_metric)
+
+- /observer
+
+-- __init__.py (from .observable import Observable)
+
+-- observable.py (contains Observable class and from ..metrics import evaluate_metrics )
+
 ## How to Use
 
 run 'fastapi dev' in the main branch
