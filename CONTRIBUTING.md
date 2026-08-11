@@ -1,72 +1,324 @@
+# CONTRIBUTING.md
 
-**Numbers correspond with module numbers in README->Structure**
-## TO-DO:
+# Contributing to AICommunityObserver
 
-1. Update MetricContext to include embedding and create embeddings from evaluate_metrics to pass to tests (if case multiple uses for it)
+Thank you for contributing to AICommunityObserver.
 
-1. Implement basic metrics tests from submodules to log.
+This project is intended to be an extensible framework for observing, evaluating, and comparing LLM interactions. Contributors are encouraged to understand the architectural goals before implementing new functionality.
 
-1. Refactor test_claim_level_entropy.py
+---
 
-1. Convert GenA11 evaluate_prompts.py into a register-able fn in metrics/
+# Project Philosophy
 
-1. Double check and add dockerfile to the git
+AICommunityObserver has two primary audiences.
 
-================== Past point of MVP ===================
+### Developers
 
-2. Implement the id schema passed to evaluate_metrics, then make it configurable through a flask endpoint
+Developers should be able to add observability to an existing LLM application with minimal changes.
 
-2. Add a customization endpoint for the order of metrics iteration in evaluate_metrics (default alphabetical)
+The preferred integration is through an `Observable` object which wraps a **single generation model** while preserving the application's normal behavior.
 
-2. Add Observer python file and object to observer dir, this modifies the wrapper but instead has prompt-responses passed manually
+### Researchers
 
-4. Implement and test dashboard and other logging display systems
+Researchers should be able to implement new evaluation methods without needing to understand provider APIs, persistence, dashboards, or other framework internals.
 
-1. Implement asynchronous or batch testing options for price efficiency.
+A new evaluation technique should typically require nothing more than implementing a metric plugin.
 
-1. Metrics langchain llm-based analysis. Planned and partially implemented:
-    - Pass aggregated runtime metrics from test runs
-    - Generalize metric_template to accept a dict -> str for adaptability instead of every individual metric
-    - Use langchain llm to summarize failures in software or anomalies in metrics and suggest causes
-    Future implementations should evaluate whether:
-    - LLM analysis adds meaningful signal over traditional observability tooling
-    - embeddings + vector search are necessary for incident comparison
+This can be done using the `@register_metric(name)` decorator. 
+---
 
-2. Implement custom api access (secret, api token, http request level access for custom models)
+# Core Architectural Principle
 
-3. Create testing endpoint to accept database of prompt-response pairs for evaluation
+The framework is **not** organized around providers or metrics.
 
-## IN-PROGRESS:
+It is organized around **MetricContext**.
 
+Every model interaction becomes a single `MetricContext`.
 
-## IN-REVIEW:
+Every metric receives that same context.
 
-## DONE:
-1. Add metrics_context object in its own file and create a class for it. This will be a configuration point for users.
-1. Implement metrics.py
-3. Add API blueprint outside of testing.py to use as a customization placeholder. 
-    - Lays foundation for selected industry benchmarks, id/model schema, percentage measurements, etc.
-    - Start with GET /metrics/schema to access the MetricsContext shape in context.py
+Expensive computations should be exposed through `MetricContext` so they can be reused rather than recomputed.
 
-## General
-**Minimum use inputs/ entry points:**
-1. API Wrapper (Observable) object to call generation on
-    - Accomplished with: APIWrapper.py in innerAI
-2. Performance logger (Observer) object to pass text into (subsitute for api calls) representing prompts and responses
+Whenever adding new functionality, first ask:
 
-In both cases the inputs (prompt-response pairs) are passed to metrics, which runs configured tests (entry point for research contributors).
-The metrics module creates logs of the inputs and test results, which the dashboard then reads.
+> "Should this become part of MetricContext rather than being implemented independently inside a metric?"
 
-**Minimum use processing:**
-1. Metrics modular testing through metrics.py, connected to API Wrapper or Performance Logger
-    - Accomplished with: 
-        - relevancy_check.py (innerAI)
-        - evaluate_claim_level_entropy.py (innerAI) + test_claim_level_entropy.py (innerAI)
-        - evaluate_prompts.py (GenA11)
+---
+# Quick Start
+TODO
 
-**Minimum use outputs:**
-1. Dashboard
-2. Feedback logging
+# Current Project Structure
+
+```
+AICommunityObserver/
+
+├── __init__.py
+├── env.py
+├── customization.py
+├── main.py
+│
+├── observer/
+│   ├── __init__.py
+│   └── observable.py
+│
+├── metrics/
+│   ├── __init__.py
+│   ├── metrics.py
+│   ├── context.py
+│   ├── config.py
+│   └── plugins/
+│
+├── testing/
+│   ├── __init__.py
+│   └── testing.py
+│
+├── dashboard/      (planned)
+└── benchmarks/     (planned)
+```
+# Separation of Responsibilities
+
+The project intentionally separates concerns.
+
+## Observable
+
+Responsible for:
+
+* communicating with model providers
+* generating responses
+* generating embeddings
+* collecting request metadata
+* constructing MetricContext
+* invoking the metrics engine
+
+Observable should **not** contain evaluation logic.
+
+---
+
+## MetricContext
+
+Represents a single evaluated interaction.
+
+It stores request-level information such as:
+
+* prompt
+* response
+* model
+* latency
+* token usage
+* metadata
+
+It also owns shared cached resources.
+
+Currently this includes:
+
+* prompt embeddings
+* response embeddings
+
+Future shared resources may include:
+
+* language detection
+* tokenization
+* log probabilities
+* provider-specific metadata
+* additional cached inference products
+
+Metrics should obtain these values from the context whenever possible rather than recomputing them.
+
+---
+
+## Metrics
+
+Metrics should be:
+
+* independent
+* deterministic where practical
+* focused on a single evaluation task
+* unaware of other metrics
+
+Metrics should never communicate directly with one another.
+
+Shared computation belongs in MetricContext.
+
+---
+
+## Persistence
+
+Persistence consumes metric results.
+
+Evaluation should remain independent from storage implementation.
+
+The default backend writes JSONL files, but future storage backends should be interchangeable.
+
+---
+
+# Plugin Philosophy
+
+The metric plugin system is intended to be the primary extension point of the framework.
+
+Each plugin should:
+
+* register itself automatically
+* accept a MetricContext
+* return a structured metric result
+* avoid side effects
+
+Example:
+
+```python
+@register_metric(
+    name="relevance.embedding.cosine_similarity"
+)
+def cosine_similarity(context):
+    ...
+```
+
+Metrics should generally not perform provider initialization or manage caching themselves.
+
+---
+
+# Naming Convention
+
+Metric names should be namespaced.
+
+Example:
+
+```text
+latency.value
+relevance.embedding.cosine_similarity
+hallucination.claim_support
+toxicity.response
+```
+
+Names should describe *what is being measured*, not how it is implemented.
+
+---
+
+# Current Extension Points
+
+The framework is designed to support independent evolution of:
+
+* model providers
+* evaluation metrics
+* persistence backends
+* dashboards
+* benchmark suites
+
+When adding new functionality, prefer introducing a new extension point rather than modifying existing modules.
+
+---
+
+# Planned Direction
+
+The following architectural goals guide future development.
+
+## Observer
+
+A future `Observer` object is planned.
+
+Unlike `Observable`, it will not perform inference.
+
+Instead it will evaluate existing prompt-response pairs supplied by external applications.
+
+This provides observability without requiring applications to replace their existing inference client.
+
+---
+
+## Richer Metric Registry
+
+The current registry stores registered metric callables.
+
+The long-term goal is to support richer metadata such as:
+
+* tags
+* categories
+* versions
+* dependencies
+* package origin
+
+This will enable more flexible discovery, configuration, and third-party metric packages.
+
+---
+
+## Third-Party Metric Packages
+
+One long-term objective is supporting independently distributed metric collections.
+
+For example:
+
+```text
+aco-bias-metrics
+aco-medical-metrics
+aco-security-metrics
+```
+
+These packages should be installable independently while integrating seamlessly with the existing metric registry.
+
+---
+
+## Benchmarks
+
+Benchmarks should combine:
+
+* prompt datasets
+* existing metrics
+* standardized evaluation procedures
+
+Benchmarks should generally reuse metric plugins rather than implementing evaluation algorithms directly.
+
+---
+
+# Design Guidelines
+
+When contributing new features, prefer the following:
+
+✔ Move shared logic into MetricContext.
+
+✔ Keep metrics small and composable.
+
+✔ Keep provider-specific logic inside Observable.
+
+✔ Prefer extension over modification.
+
+✔ Preserve compatibility with existing integrations whenever possible.
+
+---
+
+# Things to Avoid
+
+Avoid introducing unnecessary coupling between modules.
+
+Examples include:
+
+* metrics depending on other metrics
+* metrics performing persistence
+* providers containing evaluation logic
+* dashboards depending on provider implementations
+
+The architecture is intentionally layered.
+
+---
+
+# Current Project Status
+
+The framework currently provides:
+
+* Observable-based model integration
+* MetricContext
+* automatic metric registration
+* plugin-based evaluation
+* configurable metrics
+* JSONL persistence
+
+Planned work includes:
+
+* Observer
+* richer registry metadata
+* benchmark framework
+* visualization dashboard
+* additional persistence backends
+* third-party plugin ecosystem
+
+These goals should guide contributions, but implementation details are expected to evolve as the project grows.
 
 **Output schema per run of evaluate_metrics**
 NOTE: This is missing the prompt and response. It just contains the metrics for this instance.
@@ -81,31 +333,6 @@ NOTE: This is missing the prompt and response. It just contains the metrics for 
 }
 
 **NOTE: Forget about batch testing flask/fastapi endpoint examples for now. Only implement as needed for actual testing**
-
-## Submodules:
-
-**A11**
-To-take:
-1. OpenAI integration should be merged into the existing one in InnerAi
-2. User rating easy and good to have. Effectively copy paste.
-3. Prompt versioning doesn't hurt to take
-4. DevOps automation (CI/CD).
-5. Docker option (Integrate with others)
-
-Question:
-1. Feedback logging with weights and biases as opposed to existing logging
-
-For later:
-1. AWS integration (good model for other cloud integration and testing of MCP, etc.)
-
-**InsightAI**
-To-take:
-1. Basic key performance indicators/tests: latency, token throughput, successful requests
-2. Grafana dashboard (possible placeholder)
-3. Docker (Integrate with others)
-
-Question:
-1. Advance alerts through slack. Careful with bot creation so as not to spam like in the demo.
 
 **Test Ideas**
 1. Anthropic introduced "BrowseComp" to benchmark model performance finding information online. This could be tested across models for domain-specific tasks.

@@ -1,6 +1,8 @@
 # AICommunityObserver
 
-AICommunityObserver is a middleware observability layer for all GenAI applications. It sits between your application and model calls, automatically collecting and evaluating inputs without changing how you generate or store prompt and response history. Just include the AICommunityObserver in your application and access the Observer or Observable objects to make your API calls, and centralize all of your AI operations to allow unified monitoring, alerting, security, and accessibility management for all GenAI assets within your application.
+AICommunityObserver is a middleware observability layer for all GenAI applications. This is a centralized access point for all LLM service providers, the pytest of generative AI, and an automated M&E tool all rolled into one.
+
+It sits between your application and model calls, automatically collecting and evaluating inputs without changing how you generate or store prompt and response history. Just include the AICommunityObserver in your application and access the Observer or Observable objects to make your API calls, and centralize all of your AI operations to allow unified monitoring, alerting, security, and accessibility management for all GenAI assets within your application.
 
 Code of Conduct for the Community Contributors - https://acrobat.adobe.com/link/track?uri=urn:aaid:scds:US:1cb574fd-0e7e-440e-baf9-2f835c3ab602
 

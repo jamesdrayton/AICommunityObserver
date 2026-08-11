@@ -1,9 +1,12 @@
 
-import os
 import json
 import time
+import uuid
 import httpx
+import random
 import logging
+
+from collections.abc import Callable
 
 from google import genai
 from google.genai import types
@@ -23,8 +26,6 @@ from ..metrics import evaluate_metrics, MetricContext
 #     level=logging.INFO,
 #     format="%(asctime)s | %(levelname)s | %(message)s",
 # )
-
-# TODO: Assess if it's possible to generate the models list when detecting the model type on class instantiation
 
 # Helper class to track the token usage for each model
 class UsageTracker:
@@ -179,12 +180,15 @@ class Observable:
     # generate is the main point of access for instances of this class
     # generate must take a prompt, and it passes the prompt to the instance's chosen model
     def generate(self, prompt: str | list, max_tokens: int = 256, temperature: float = 1.0,
-                       metadata: dict = {}, url: str = "", headers=None, body=None,
-                       return_context: bool = False):
+                       metadata: dict | None = None, url: str = "", headers = None, body = None,
+                       return_context: bool = False, id: int | str | Callable[[], object] = uuid.uuid4):
 
-        # Use empty dict if metadata is None (safer than default mutable argument)
+        # Use empty dict if metadata is None (safer than default mutable argument, prevents dict being reused across calls)
         if metadata is None:
-            metadata = {}
+            metadata = {"maintain_privacy" : True}
+        # Generate a unique id using the given function if it is a function
+        if callable(id):
+            id = id()
 
         # Generate unique log ID based on start time
         start_time = time.time()
@@ -233,34 +237,42 @@ class Observable:
 
             metadata["latency"] = duration
             metadata["tokens_used"] = response.usage_metadata.total_token_count if hasattr(response, "usage_metadata") else 999999 # Flag for missing token usage data
+            # TODO: Log or raise an error if tokens_used exceeds max_tokens
             metadata["embedding_model"] = self.embedding_model
+            metadata["maintain_privacy"] = metadata.get("maintain_privacy", True)
 
             # ========== Call evaluate_metrics to implement the observability aspect ==========
-            # TODO: Configure to:
-            # - Use one single schema for ids
-            # - Only evaluate some percentage of the time with self.testing_freq
+            # Only evaluate some percentage of the time with self.testing_freq
+            random.seed(id)
+            metadata["test?"] = (random.random() > self.testing_freq)
+
             context = MetricContext(
                 prompt=prompt,
                 response=response_text,
                 latency=duration,
                 tokens_used=metadata["tokens_used"],
                 model=self.model_name,
-                embed_provider=self.embed
+                embed_function=self.embed
             )
-            evaluate_metrics(id=123, context=context, metadata=metadata)
+            evaluate_metrics(id=id, context=context, metadata=metadata)
             if return_context:
                 return response_text, context
             return response_text
 
         except Exception as e:
             duration = time.time() - start_time
-
-            evaluate_metrics(id=123, model=self.model_name,
-                             given_prompt=prompt, given_response=f"Failure to reach model within Community Observer. Exception: {e}",
-                             metadata=metadata)
+            metadata["test?"] = False
+            metadata["tokens_used"] = 0
+            context = MetricContext(
+                prompt=prompt,
+                response=f"Failure to reach model within Community Observer. Exception: {e}",
+                latency=duration,
+                tokens_used=0,
+                model=self.model_name,
+                embed_function=self.embed
+            )
+            evaluate_metrics(id=id, context=context, metadata=metadata)
             raise Exception(f"Failure to reach model within Community Observer. Exception: {e}")
-
-            return None
     
     # TODO: Configure for batch embedding
     # embed is a general purpose embedding function which will adjust to chosen embedding models according to the defined observable model

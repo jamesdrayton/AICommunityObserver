@@ -31,19 +31,24 @@ class MetricContext:
         latency: float = 999.999,
         tokens_used: int = 999999,
         model: str = "",
-        embed_provider: Optional[Callable[..., Any]] = None,
+        embed_function: Optional[Callable[..., Any]] = None,
         metadata: Dict[str, Any] | None = None
     ):
+        # Essential low-level fields
         self.prompt = prompt
         self.response = response
         self.latency = latency
         self.tokens_used = tokens_used
         self.model = model
 
+        # Non-essential low-level fields
+        self.language = None #TODO: Implement
+
+        # Higher level fields for embedding-based metrics
         self.client = None
-        self.embed_provider = embed_provider
+        self.embed_function = embed_function
         self.prompt_embeddings = prompt_embeddings or {}
-        self.response_embeddings = response_embeddings or {}
+        self.response_embeddings = response_embeddings or {}        
 
         # Flexible extension point
         self.metadata = metadata or {}
@@ -82,7 +87,7 @@ class MetricContext:
     def get_prompt_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
         key = (model, task_type)
         if key not in self.prompt_embeddings and self.prompt:
-            self.prompt_embeddings[key] = self.embed_provider(
+            self.prompt_embeddings[key] = self.embed_function(
                 self.prompt,
                 task_type=task_type,
                 model=model
@@ -92,7 +97,7 @@ class MetricContext:
     def get_response_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
         key = (model, task_type)
         if key not in self.response_embeddings and self.response:
-            self.response_embeddings[key] = self.embed_provider(
+            self.response_embeddings[key] = self.embed_function(
                 self.response,
                 task_type=task_type,
                 model=model

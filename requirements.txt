@@ -9,3 +9,5 @@ scikit-learn >= 1.6.1
 
 # HTTP Client
 httpx>=0.28.1
+
+dotenv>=1.0.0
