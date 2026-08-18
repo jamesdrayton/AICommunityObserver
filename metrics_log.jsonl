@@ -1,1 +1,0 @@
-{"timestamp": 1784030802.9074867, "data": {"id": 123, "model": "gemini-3.5-flash", "metadata": {"latency": 9.203631162643433, "tokens_used": 264}, "metrics": {"relevance.embedding.cosine_similarity": 0.8681352374757438}}}

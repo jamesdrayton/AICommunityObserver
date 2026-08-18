@@ -5,9 +5,10 @@ openai>=2.45.0
 huggingface-hub>=0.34.4
 
 # Metrics requirements or ML
-scikit-learn >= 1.6.1
+scikit-learn>=1.6.1
 
-# HTTP Client
+# HTTP Client & API handling
 httpx>=0.28.1
+fastapi[standard]>=0.111.1
 
-dotenv>=1.0.0
+python-dotenv>=1.0.0

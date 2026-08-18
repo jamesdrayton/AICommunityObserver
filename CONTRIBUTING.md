@@ -6,6 +6,8 @@ Thank you for contributing to AICommunityObserver.
 
 This project is intended to be an extensible framework for observing, evaluating, and comparing LLM interactions. Contributors are encouraged to understand the architectural goals before implementing new functionality.
 
+At present, this (CONTRIBUTING.md) document is probably 50% AI generated, and so has limited use, although all of the essential context within it (structure etc.) is valid and useful.
+
 ---
 
 # Project Philosophy
@@ -51,26 +53,35 @@ TODO
 
 ```
 AICommunityObserver/
-
-├── __init__.py
-├── env.py
-├── customization.py
-├── main.py
+├── .gitignore
+├── .gitmodules
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── snapshot.md
+├── pyproject.toml
+├── requirements.txt
 │
-├── observer/
-│   ├── __init__.py
-│   └── observable.py
-│
-├── metrics/
-│   ├── __init__.py
-│   ├── metrics.py
-│   ├── context.py
-│   ├── config.py
-│   └── plugins/
-│
-├── testing/
-│   ├── __init__.py
-│   └── testing.py
+└── src/
+│    └── AICommunityObserver/
+│        ├── __init__.py
+│        ├── env.py (no internal imports)
+│        ├── metrics/
+│        │   ├── __init__.py (from .metrics import evaluate_metrics, register_metric, registered_metrics, is_evaluation_active
+│        │   │                from .context import MetricContext 
+│        │   │                from .config import get_enabled_metrics, set_enabled_metrics, set_log_file, get_log_file, is_metric_enabled, get_metric_order, set_metric_order)
+│        │   ├── metrics.py (from .context import MetricContext and from .config import is_metric_enabled) 
+│        │   ├── context.py
+│        │   ├── config.py
+│        │   └── plugins/* (from ..metrics import register_metric)
+│        ├── observer/
+│        │   ├── __init__.py (from .observable import Observable)
+│        │   └── observable.py (contains Observable class and from ..metrics import evaluate_metrics)
+│        └── web/
+│            ├── __init__.py (from .testing import testing)
+│            ├── main.py (from . import testing  and from . import customization)
+│            ├── customization.py (from ..metrics import MetricContext, registered_metrics, get_enabled_metrics, set_enabled_metrics)
+│            └── testing.py (from ..observer import Observable and from ..env import get_env_variable)
 │
 ├── dashboard/      (planned)
 └── benchmarks/     (planned)
@@ -323,14 +334,48 @@ These goals should guide contributions, but implementation details are expected 
 **Output schema per run of evaluate_metrics**
 NOTE: This is missing the prompt and response. It just contains the metrics for this instance.
 {
-  "id": "123",
-  "model": "",
-  "metrics": {
-    "latency.value": 0.42,
-    "response.length": 120,
-    "drift.semantic_similarity": 0.96
-  }
+    "timestamp": 1786620909.6240191, 
+    "data": 
+        {
+            "id": "53827493-f177-4a05-aab0-5c29686975b8", 
+            "model": "gemini-3.5-flash", 
+            "metadata": 
+                {
+                "maintain_privacy": true, 
+                "latency": 2.557722806930542, 
+                "tokens_used": 300, 
+                "embedding_model": "gemini-embedding-001", 
+                "do_tests": true
+                }, 
+            "metrics": 
+                {
+                    "relevance.embedding.cosine_similarity": 0.8973972227783809
+                }
+        }
 }
+This will also contain the prompt and response in the json data IFF maintain_privacy is set to false. Otherwise:
+{
+    "timestamp": 1787041075.7764058, 
+    "data": 
+        {
+            "id": "4fcac831-0b5a-446b-bd3e-6c98f57e47e6", 
+            "model": "gemini-3.5-flash", 
+            "prompt": "Hi, this is an api test to demo how logging works. All good?", 
+            "response": "Hi there! Yes, all good! - The API", 
+            "metadata": 
+                {
+                    "maintain_privacy": false, 
+                    "latency": 10.778486490249634, 
+                    "tokens_used": 269, 
+                    "embedding_model": 
+                    "gemini-embedding-001", 
+                    "do_tests": false
+                }, 
+            "metrics": {}
+        }
+}
+
+
 
 **NOTE: Forget about batch testing flask/fastapi endpoint examples for now. Only implement as needed for actual testing**
 
