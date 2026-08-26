@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
 from ..metrics import MetricContext, registered_metrics, get_enabled_metrics, set_enabled_metrics
-# from metrics.config import get_enabled_metrics, set_enabled_metrics
 
 customization_router = APIRouter()
 

@@ -226,6 +226,39 @@ def create_hf_message(prompt=None, threadId=123, modelName="ACADES/Qwen3-4B-EN-C
         print("Error generating HuggingFace response:", e)
         return ({"error": str(e)}), 500
 
+@router.get("/create_default_embedding", tags=["RAG Calls"])
+def create_default_embedding(text=None):
+    """
+    Create an embedding of a given text using the default model in use.
+    Default preparation is using one pre-established wrapper defined at the top of testing.py
+    ---
+    tags:
+      - RAG Calls
+    parameters:
+      - name: text
+        in: query
+        type: string
+        required: true
+        description: "The text to embed"
+    responses:
+      200:
+        description: The model's inference response
+        schema:
+          type: json
+    """
+    
+    try:
+        # Generate response using the Observable
+        embedding = gemini_middleware.embed(text=text)
+                
+        return ({
+            "text": text,
+            "embedding": embedding
+        })
+    except Exception as e:
+        print("Error generating Gemini response:", e)
+        return ({"error": str(e)}), 500
+
 # META-PURPOSE: Running this endpoint shows how the monitoring system works at scale. 
 # Given that this endpoint prompts all models and runs multiple tests on each,
 

@@ -39,7 +39,7 @@ class Observable:
                 - client_id: str
                 - client_secret: str
                 - For: Custom API endpoints
-        - "model_type" The type of model a.k.a. the provider
+        - "provider" The type of model a.k.a. the provider
         - "model_name" The name of the model (default gemini-3.5-flash). Current options: Gemini, OpenAI, HuggingFace.
         - "testing_freq" A float representing the percentage of calls using this object which will have run tests. Default: 0.1 a.k.a 10%
         - "id_gen" A Callable (function) responsible for id handling. Default: uuid4
@@ -65,7 +65,7 @@ class Observable:
         return
     
     # Init will instantiate the instance as usual, and check if all of the necessary parameters are present for the stated access type
-    def __init__(self, model_type: str = "gemini", model_name: str = "gemini-3.5-flash",                            # Basic essential parameters
+    def __init__(self, provider: str = "google", model_name: str = "gemini-3.5-flash",                              # Basic essential parameters
                  api_key: str | None = None, access_type: str = "api_key",                                          # API key access parameters
                  token_url: str | None = None, client_id: str | None = None, client_secret: str | None = None,      # API token access parameters
                  testing_freq: float = 0.1, provider_options: dict = {},                                            # User customization options
@@ -79,7 +79,7 @@ class Observable:
         
         # Define wrapper access constants
         self.access_type = access_type.lower()
-        self.model_type = model_type.lower()
+        self.provider = provider.lower()
         self.model_name = model_name.lower()
         self.embedding_model = "gemini-embedding-001" # TODO: Choose embedding model with a function
         self.api_key = api_key
@@ -97,7 +97,7 @@ class Observable:
         if access_type == "api_key":
             # Detect model type and initialize accordingly
             client_kwargs = self.provider_options.get("client", {})
-            if self.model_type == "gemini":
+            if self.provider == "google":
                 try:
                     # Google Gemini
                     self.model = genai.Client(
@@ -105,23 +105,23 @@ class Observable:
                         **client_kwargs
                         )
                 except Exception as e:
-                    print(f"Couldn't instantiate chosen model type: {self.model_type}. Exception returned: {e}")
-            elif self.model_type == "openai":
+                    print(f"Couldn't instantiate chosen model type: {self.provider}. Exception returned: {e}")
+            elif self.provider == "openai":
                 try:
                     # OpenAI
                     self.model = OpenAI(api_key=api_key)
                 except Exception as e:
-                    print(f"Couldn't instantiate chosen model type: {self.model_type}. Exception returned: {e}")
-            elif self.model_type == "huggingface":
+                    print(f"Couldn't instantiate chosen model type: {self.provider}. Exception returned: {e}")
+            elif self.provider == "huggingface":
                 try:
                     # HuggingFace Inference API
                     # TODO: Alternate between InferenceClient and Unsloth FastLanguageModel based on _detect_hardware()
                     self.model = InferenceClient(model=model_name, token=api_key)
                 except Exception as e:
-                    print(f"Couldn't instantiate chosen model type: {self.model_type}. Exception returned: {e}")
+                    print(f"Couldn't instantiate chosen model type: {self.provider}. Exception returned: {e}")
             else:
-                raise ValueError(f"Unknown model type for {model_name}. Supported types: gemini, openai, huggingface")
-                
+                raise ValueError(f"Unknown model type for {model_name}. Supported types: google, openai, huggingface")
+
         elif access_type == "api_token":
             self.TOKEN_URL = token_url
             self.CLIENT_ID = client_id
@@ -151,9 +151,8 @@ class Observable:
             return token_cache["access_token"]
         
     # TODO: Make work with access_type: api_token as well as access_type: api_key
-    # TODO: Configure for batch generation
     # generate is the main point of access for instances of this class
-    # generate must take a prompt, and it passes the prompt to the instance's chosen model
+    # generate must take a prompt or list of prompts, and it passes the prompt to the instance's chosen model
     def generate(self, prompt: str | list, max_tokens: int = 256, temperature: float = 1.0, 
                        testing_freq: float | int | None = None, do_tests: bool | None = None,
                        metadata: dict | None = None, provider_options: dict | None = None, 
@@ -185,12 +184,13 @@ class Observable:
         start_time = time.time()
 
         # ========== Try making the call to the respective model with the given prompt ==========
+        # TODO: 0.5.0 Switch to batch generation function here if prompt is a list (and/or make it an option)
         try:
             # Point of difference for api_key vs api_token access type
             if self.access_type == "api_key":
                 generate_kwargs = provider_options.get("generate", {})
                 # Handle different model types
-                if self.model_type == "gemini":
+                if self.provider == "google":
                     response = self.model.models.generate_content(
                         model=self.model_name,
                         contents=prompt,
@@ -202,7 +202,7 @@ class Observable:
                     )
                     response_text = response.text.strip()
 
-                elif self.model_type == "openai":
+                elif self.provider == "openai":
                     response = self.model.chat.completions.create( #type: ignore
                         model=self.model_name,
                         messages=[{"role": "user", "content": prompt}],
@@ -212,7 +212,7 @@ class Observable:
                     )
                     response_text = response.choices[0].message.content.strip()
 
-                elif self.model_type == "huggingface":
+                elif self.provider == "huggingface":
                     response = self.model.text_generation(
                         prompt,
                         **generate_kwargs
@@ -220,7 +220,7 @@ class Observable:
                     response_text = response.strip()
 
                 else:
-                    raise ValueError(f"Unsupported model type: {self.model_type}")
+                    raise ValueError(f"Unsupported model type: {self.provider}")
             else:
                 raise ValueError("Cannot access the API without url, headers, and body")
 
@@ -269,10 +269,43 @@ class Observable:
             )
             evaluate_metrics(id=id, context=context, metadata=metadata) if not is_evaluation_active() else None
             raise Exception(f"Failure to reach model within Community Observer. Exception: {e}")
+
+    # TODO: 0.5.0 Review, implement, and add to __init__
+    # NOTE: Auto-generated stub not in use until reviewed. At a glance it seems to not use the actual batch options from the provider
+    # batch_generate is a variant of generate which uses the cheaper batch generation option if the provider has it. Can be called directly or through generate.
+    # batch_generate must take a prompt or list of prompts, and it passes the prompt to the instance's chosen model
+    def batch_generate(self, prompts: str | list, max_tokens: int = 256, temperature: float = 1.0,
+                       testing_freq: float | int | None = None, do_tests: bool | None = None,
+                       metadata: dict | None = None, provider_options: dict | None = None, 
+                       url: str = "", headers = None, body = None,                                        # Leftover from api_token options
+                       return_context: bool = False, id: int | str | Callable[[], object] | None = None):
+        responses = []
+        contexts = []
+        for prompt in prompts:
+            response, context = self.generate(
+                prompt=prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                testing_freq=testing_freq,
+                do_tests=do_tests,
+                metadata=metadata,
+                provider_options=provider_options,
+                url=url,
+                headers=headers,
+                body=body,
+                return_context=True,
+                id=id
+            )
+            responses.append(response)
+            contexts.append(context)
+        
+        if return_context:
+            return responses, contexts
+        return responses
     
     # TODO: Configure for batch embedding
     # embed is a general purpose embedding function which will adjust to chosen embedding models according to the defined observable model
-    # embed must take text (to perform the embedding on) and returns a vector
+    # embed must take a str text (to perform the embedding on) and returns a vector
     def embed(self, text: str | list, task_type: str = "SEMANTIC_SIMILARITY", embedding_model: str = "gemini-embedding-001"):
         # TODO: Configure for different model types (currently all gemini free)
         try:
