@@ -6,7 +6,7 @@ import time
 import json
 import os
 
-from .config import is_metric_enabled, set_enabled_metrics, get_enabled_metrics, get_log_file, get_metric_order
+from .config import is_metric_enabled, set_enabled_metrics, get_log_file, get_metric_order
 
 from .context import MetricContext
 

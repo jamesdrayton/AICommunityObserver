@@ -1,10 +1,8 @@
 
-import json
 import time
 import uuid
 import httpx
 import random
-import logging
 
 from collections.abc import Callable
 
@@ -68,7 +66,7 @@ class Observable:
     def __init__(self, provider: str = "google", model_name: str = "gemini-3.5-flash",                              # Basic essential parameters
                  api_key: str | None = None, access_type: str = "api_key",                                          # API key access parameters
                  token_url: str | None = None, client_id: str | None = None, client_secret: str | None = None,      # API token access parameters
-                 testing_freq: float = 0.1, provider_options: dict = {},                                            # User customization options
+                 testing_freq: float = 0.1, provider_options: dict | None = None,                                   # User customization options
                  id_gen: Callable[[], object] = uuid.uuid4
                  ):
         # Immediately checks for errors in given params, continues if all is well.
@@ -90,9 +88,8 @@ class Observable:
         self.testing_freq = testing_freq
         self.id_gen = id_gen
 
-        if not isinstance(provider_options, dict):
-            raise TypeError("provider_options must be a dictionary if provided.")
-        self.provider_options = provider_options or {"client": {}, "generate": {}}
+        if provider_options is None:
+            self.provider_options = {"client": {}, "generate": {}}
         
         if access_type == "api_key":
             # Detect model type and initialize accordingly
@@ -165,9 +162,8 @@ class Observable:
         elif metadata.get("maintain_privacy") == None:
             metadata["maintain_privacy"] = True
 
-        if not isinstance(provider_options, dict):
-            raise TypeError("provider_options must be a dictionary if provided.")
-        provider_options = provider_options or self.provider_options
+        if provider_options is None:
+            provider_options = self.provider_options
 
         # Generate a unique id using the given function if it is a function
         if id is None:

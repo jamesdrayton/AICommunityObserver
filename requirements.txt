@@ -1,8 +1,8 @@
 
 # LLM Service Providers
-google-genai>=2.11.0
+google-genai>=2.10.0
 openai>=2.45.0
-huggingface-hub>=0.34.4
+huggingface-hub>=0.4.0
 
 # Metrics requirements or ML
 scikit-learn>=1.6.1
