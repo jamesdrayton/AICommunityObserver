@@ -294,11 +294,13 @@ Add infrastructure for GDPA compliant data sharing on cross-industry metric effe
 Enable automated testing for cross-industry task, model, and procedure comparisons.
 
 v???
+Explicitly enable metrics beyond single prompt-responses (e.g. conversation history)
 Select embedding models according to chosen model and provieder on Observable initialization
 [project.entry-points."aicommunityobserver.metrics"] endpoint utilization (auto-registering external plugins)
 MCP-specific integration. Support local or server-side testing.
 Agent/Model harness monitoring.
 Local model loading with hardware detection. 
+Enable use of metrics to auto-generate training data.
 
 ---
 Current Community Contributors to this Repo : 

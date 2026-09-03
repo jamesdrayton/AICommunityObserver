@@ -87,6 +87,7 @@ class Observable:
         # Define wrapper configuration constants
         self.testing_freq = testing_freq
         self.id_gen = id_gen
+        self.provider_options = provider_options
 
         if provider_options is None:
             self.provider_options = {"client": {}, "generate": {}}
@@ -185,26 +186,27 @@ class Observable:
             # Point of difference for api_key vs api_token access type
             if self.access_type == "api_key":
                 generate_kwargs = provider_options.get("generate", {})
+                generate_kwargs["temperature"] = generate_kwargs.get("temperature", temperature)
+                generate_kwargs["max_tokens"] = generate_kwargs.get("max_tokens", max_tokens)
                 # Handle different model types
                 if self.provider == "google":
+                    generate_kwargs.pop("max_tokens")
+                    generate_kwargs["max_output_tokens"] = generate_kwargs.get("max_tokens", max_tokens)
                     response = self.model.models.generate_content(
                         model=self.model_name,
                         contents=prompt,
                         config=types.GenerateContentConfig(
                             **generate_kwargs,
-                            temperature=temperature,
-                            max_output_tokens=max_tokens,
                         )
                     )
                     response_text = response.text.strip()
 
                 elif self.provider == "openai":
+                    # TODO: verify openai kwarg names
                     response = self.model.chat.completions.create( #type: ignore
                         model=self.model_name,
                         messages=[{"role": "user", "content": prompt}],
                         **generate_kwargs,
-                        temperature=temperature,
-                        max_completion_tokens=max_tokens,
                     )
                     response_text = response.choices[0].message.content.strip()
 

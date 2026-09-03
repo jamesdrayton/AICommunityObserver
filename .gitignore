@@ -2,6 +2,8 @@ src/AICommunityObserver/env.py
 src/AICommunityObserver/metrics/performance_logger.py
 src/AICommunityObserver/metrics/metric_analysis.py
 src/AICommunityObserver/logs/*
+Submodules
+Submodules/*
 __pycache__/
 dist/
 build/

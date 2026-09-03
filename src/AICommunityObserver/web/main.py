@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
-    from . import testing
-    from . import customization
+    from . import testing, customization
 except ImportError as e:
     print("Missing directories to run the API for customization and/or testing.")
 except Exception as e:
