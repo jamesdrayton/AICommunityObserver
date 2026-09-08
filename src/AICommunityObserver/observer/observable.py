@@ -1,7 +1,7 @@
 
 import time
 import uuid
-import httpx
+import requests
 import random
 
 from collections.abc import Callable
@@ -119,25 +119,25 @@ class Observable:
     # =================================================================== General api_token access ==============================================================================
 
     # Purpose: call to get an access token from the API
-    async def get_access_token(self):
-        token_cache = self.token_cache
-        # reuse if not expired
-        if token_cache["access_token"] and token_cache["expires_at"] > time.time():
-            return token_cache["access_token"]
+    # async def get_access_token(self):
+    #     token_cache = self.token_cache
+    #     # reuse if not expired
+    #     if token_cache["access_token"] and token_cache["expires_at"] > time.time():
+    #         return token_cache["access_token"]
 
-        async with httpx.AsyncClient() as client:
-            data = {
-                "grant_type": "client_credentials",
-                "client_id": self.CLIENT_ID,
-                "client_secret": self.CLIENT_SECRET,
-                "scope": self.SCOPE
-            }
-            resp = await client.post(self.TOKEN_URL, data=data)
-            resp.raise_for_status()
-            token_data = resp.json()
-            token_cache["access_token"] = token_data["access_token"]
-            token_cache["expires_at"] = time.time() + token_data.get("expires_in", 3600) - 10
-            return token_cache["access_token"]
+    #     async with httpx.AsyncClient() as client:
+    #         data = {
+    #             "grant_type": "client_credentials",
+    #             "client_id": self.CLIENT_ID,
+    #             "client_secret": self.CLIENT_SECRET,
+    #             "scope": self.SCOPE
+    #         }
+    #         resp = await client.post(self.TOKEN_URL, data=data)
+    #         resp.raise_for_status()
+    #         token_data = resp.json()
+    #         token_cache["access_token"] = token_data["access_token"]
+    #         token_cache["expires_at"] = time.time() + token_data.get("expires_in", 3600) - 10
+    #         return token_cache["access_token"]
         
     # TODO: Make work with access_type: api_token as well as access_type: api_key
     # generate is the main point of access for instances of this class

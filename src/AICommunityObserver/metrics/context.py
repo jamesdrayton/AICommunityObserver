@@ -9,6 +9,8 @@ This acts as the canonical schema for all metric inputs.
 
 from collections.abc import Callable
 from .config import get_metric_schema
+from google import genai
+from google.genai import types
 
 from typing import Any, Dict, Optional
 
@@ -30,6 +32,7 @@ class MetricContext:
         latency: float = 999.999,
         tokens_used: int = 999999,
         model: str = "",
+        embed_function: Optional[Callable[..., Any]] = None,
         metadata: Dict[str, Any] | None = None
     ):
         # Essential low-level fields
@@ -50,6 +53,7 @@ class MetricContext:
 
         # Higher level fields for embedding-based metrics
         self.client = None
+        self.embed_function = embed_function
         self.prompt_embeddings = prompt_embeddings or {}
         self.response_embeddings = response_embeddings or {}        
 
@@ -97,3 +101,27 @@ class MetricContext:
             },
             "metadata": self.metadata
         }
+
+    # =============================================== Embedding Model Helpers ===============================================
+    # Only to be used within metric plugins for enhanced caching. Soon to be deprecated here and replaced with the observable.
+    
+    # Note: These vary with content configs. Current embedding caching is within a dict referred to by (model, task_type)
+    def get_prompt_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
+        key = (model, task_type)
+        if key not in self.prompt_embeddings and self.prompt:
+            self.prompt_embeddings[key] = self.embed_function(
+                self.prompt,
+                task_type=task_type,
+                embedding_model=model
+            )
+        return self.prompt_embeddings[key]
+    
+    def get_response_embedding(self, task_type: str = "SEMANTIC_SIMILARITY", model: str = "gemini-embedding-001"):
+        key = (model, task_type)
+        if key not in self.response_embeddings and self.response:
+            self.response_embeddings[key] = self.embed_function(
+                self.response,
+                task_type=task_type,
+                embedding_model=model
+            )
+        return self.response_embeddings[key]

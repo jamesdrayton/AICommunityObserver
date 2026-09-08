@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from AICommunityObserver.metrics import (MetricContext, registered_metrics, get_enabled_metrics, 
+from AICommunityObserver.metrics import (registered_metrics, get_enabled_metrics, 
                                          set_enabled_metrics, set_id_gen, get_id_gen, set_log_file, 
                                          set_metric_schema, get_metric_schema)
 
@@ -95,11 +95,12 @@ def set_id_generator_endpoint(data: dict):
     Since Python callables cannot be supplied directly through JSON,
     the endpoint accepts the name of a supported ID generator.
 
-    NOTE: Placeholder
+    NOTE: Placeholder.
     """
     id_gen_name = data.get("id_gen")
 
     if id_gen_name == "uuid4":
+        # set_id_gen(id_gen)
         return { "id_gen": id_gen_name }
     else:
         raise HTTPException(

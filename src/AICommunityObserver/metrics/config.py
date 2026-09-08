@@ -6,11 +6,12 @@ import uuid
 LOG_FILE = Path("metrics_log.jsonl") # Default file path
 ID_GEN = uuid.uuid4                  # Default callable
 METRIC_SCHEMA = {                    # Default schema
+            "id": str,
             "prompt": str,
             "response": str,
             "model": str,
             "metrics": dict,
-            "metadata": object,
+            "metadata": dict,
         }
 
 ENABLED_METRICS = None               # Set of metric names that are enabled for recording and storage. By default, all registered metrics are enabled.

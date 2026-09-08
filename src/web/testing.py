@@ -75,39 +75,6 @@ def call_with_retries(api_func, *args, retries=3, backoff=2, jitter=0.2, **kwarg
 # ======================================================================= Primary endpoints (Model Calls)  =======================================================================
 
 @router.get("/create_gemini_message", tags=["Model Calls"])
-def create_message(prompt=None):
-    """
-    Create a new external message calling a Google genai model.
-    Default preparation is using one pre-established wrapper defined at the top of testing.py
-    ---
-    tags:
-      - Model Calls
-    parameters:
-      - name: prompt
-        in: query
-        type: string
-        required: true
-        description: "The message being sent"
-    responses:
-      200:
-        description: The model's inference response
-        schema:
-          type: json
-    """
-    
-    try:
-        # Generate response using the Observable
-        response = gemini_middleware.generate(prompt=prompt, max_tokens=2560, metadata={"maintain_privacy": False})
-                
-        return ({
-            "prompt": prompt,
-            "response": response
-        })
-    except Exception as e:
-        print("Error generating Gemini response:", e)
-        return ({"error": str(e)}), 500
-
-@router.get("/create_gemini_message", tags=["Model Calls"])
 def create_gemini_message(prompt=None):
     """
     Create a new external message calling a Google genai model.
