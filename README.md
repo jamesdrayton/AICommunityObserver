@@ -1,16 +1,7 @@
 # AICommunityObserver
 
-AICommunityObserver is a middleware observability layer for all GenAI applications. This is a centralized access point for all LLM service providers, .
-
-Without AICO:
-
-application → Gemini/OpenAI/etc.
-
-With AICO:
-
-application → Observable → Gemini/OpenAI/etc.
-                        ↓
-                 metrics + logging
+AICommunityObserver is a middleware observability layer for all GenAI applications. This is a centralized access point for all LLM service providers and 
+an automated metric gathering platform all in one.
 
 It sits between your application and model calls, automatically collecting and evaluating inputs without changing how you generate or store prompt and response history. Just include the AICommunityObserver in your application and access the Observer or Observable objects to make your API calls, and centralize all of your AI operations to allow unified monitoring, alerting, security, and accessibility management for all GenAI assets within your application.
 

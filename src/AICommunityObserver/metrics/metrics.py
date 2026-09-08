@@ -1,4 +1,6 @@
 
+from importlib.metadata import entry_points
+from collections.abc import Callable
 from contextvars import ContextVar
 from pathlib import Path
 import importlib
@@ -6,7 +8,7 @@ import time
 import json
 import os
 
-from .config import is_metric_enabled, set_enabled_metrics, get_log_file, get_metric_order
+from .config import is_metric_enabled, set_enabled_metrics, get_log_file, get_metric_order, get_id_gen
 
 from .context import MetricContext
 
@@ -28,7 +30,7 @@ _evaluation_active = ContextVar(
 
 registered_metrics = set()
 
-def register_metric(name: str=None, tags: list[str]=None):
+def register_metric(name: str | None = None, tags: list[str] | None = None):
     """
     Decorator used to register a metric function.
 
@@ -47,7 +49,6 @@ def register_metric(name: str=None, tags: list[str]=None):
         tags = []
     tags = [tag.strip() for tag in name.split(".")] if name else []
     def decorator(func):
-        registered_metrics.add(func)
         func.metric_name = name or func.__name__
         func.tags = tags
         registered_metrics.add(func)
@@ -61,12 +62,20 @@ def is_evaluation_active() -> bool:
 # Primary entry for developers using the Observer or Observable middleware.
 # Takes in the prompt, response, latency, and other relevant info and evaluates all registered metrics. Adds to log_history and returns results.
 # Should be called once per prompt-response pair, and each call should have exactly one distinct corresponding context object, which is paired with a unique id.
-def evaluate_metrics(id: int | str, context: MetricContext, metadata: dict | None = None):
+def evaluate_metrics(context: MetricContext, id: Callable[[], object] | int | str | None = None, metadata: dict | None = None):
 
     if metadata is None:
         metadata = {"maintain_privacy" : True}
     elif metadata.get("maintain_privacy") == None:
         metadata["maintain_privacy"] = True
+
+    if id is None:
+        # Get the configured id generator if no id was given
+        id = get_id_gen()
+    if callable(id):
+        # Generate a unique id using the given function if it is a function
+        id = id()
+    # If both of these were skipped, then the id passed was an int or str
 
     info = {
         "id": str(id),
@@ -76,6 +85,7 @@ def evaluate_metrics(id: int | str, context: MetricContext, metadata: dict | Non
         "metadata": metadata,
         "metrics": {}
     }
+    info = MetricContext.schema(info)
 
     # Check if the context has flagged to not run a test
     do_tests = metadata.get("do_tests", False)
@@ -139,8 +149,16 @@ def save_metrics(data, file_path=None):
 
     return
 
-# Helper to load ALL files containing measurable tests in this directory.
 def load_metric_plugins():
+    # Discover and load ALL pypi metrics through the external entry-point
+    try:
+        metric_entry_points = entry_points(group="aicommunityobserver.metrics")
+        for entry_point in metric_entry_points:
+            entry_point.load()
+    except Exception as e:
+        print(f"Error loading external metric plugins: {e}")
+
+    # Load ALL files containing measurable tests in this directory.
     plugins_dir = os.path.dirname(__file__) + "/plugins"
     # Iterates over and imports all decorated metrics files so they're loaded
     try:
@@ -149,9 +167,9 @@ def load_metric_plugins():
                 module_name = file[:-3]
                 importlib.import_module(f".plugins.{module_name}", package=__package__)
     except FileNotFoundError as e:
-        raise Exception(f"Error loading metric plugins: {e} \n Consider checking directory pathing.")
+        print(f"Error loading metric plugins: {e} \n Consider checking directory pathing.")
     except Exception as e:
-        raise Exception(f"Error loading metric plugins: {e}")
+        print(f"Error loading metric plugins: {e}")
 
 load_metric_plugins()
 set_enabled_metrics(registered_metrics)

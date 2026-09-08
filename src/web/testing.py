@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from ..observer import Observable
-from ..env import get_env_variable
+from AICommunityObserver import Observable
+from .env import get_env_variable
 
 import asyncio
 import time
@@ -22,12 +22,6 @@ TESTING_FREQ = 1 # set so 100 percent of all api calls will be tested in depth (
 
 gemini_middleware = Observable(api_key=GEMINI_API_KEY, model_name='gemini-3.5-flash', testing_freq=TESTING_FREQ) if GEMINI_API_KEY else None 
 openai_middleware = Observable(api_key=OPENAI_API_KEY, model_name="gpt-5.4-nano", testing_freq=TESTING_FREQ) if OPENAI_API_KEY else None
-
-# Models dict is composed of each model name as its keys and a list of the model api key/id in position 0 and the wrapper object in position 1
-models_dict = {
-    "gemini-3.5-flash": gemini_middleware if GEMINI_API_KEY else None, 
-    "gpt-5-nano": openai_middleware if OPENAI_API_KEY else None, 
-}
 
 default_model = "gemini-3.5-flash"
 
@@ -79,6 +73,39 @@ def call_with_retries(api_func, *args, retries=3, backoff=2, jitter=0.2, **kwarg
 # ======================================================================= API endpoints =======================================================================
 
 # ======================================================================= Primary endpoints (Model Calls)  =======================================================================
+
+@router.get("/create_gemini_message", tags=["Model Calls"])
+def create_message(prompt=None):
+    """
+    Create a new external message calling a Google genai model.
+    Default preparation is using one pre-established wrapper defined at the top of testing.py
+    ---
+    tags:
+      - Model Calls
+    parameters:
+      - name: prompt
+        in: query
+        type: string
+        required: true
+        description: "The message being sent"
+    responses:
+      200:
+        description: The model's inference response
+        schema:
+          type: json
+    """
+    
+    try:
+        # Generate response using the Observable
+        response = gemini_middleware.generate(prompt=prompt, max_tokens=2560, metadata={"maintain_privacy": False})
+                
+        return ({
+            "prompt": prompt,
+            "response": response
+        })
+    except Exception as e:
+        print("Error generating Gemini response:", e)
+        return ({"error": str(e)}), 500
 
 @router.get("/create_gemini_message", tags=["Model Calls"])
 def create_gemini_message(prompt=None):
@@ -149,13 +176,7 @@ def create_openai_message(prompt=None, temperature=1.0, threadId=123, modelName=
     """
     
     try:
-        # Try to get model from models_dict, or catch KeyError
-        # if modelName in models_dict and models_dict[modelName] is not None:
-        #     openai_wrapper = models_dict[modelName]
-        # else:
-        #     # Create a new wrapper instance if not in dict
-        #     openai_wrapper = Observable(api_key=OPENAI_API_KEY, model_name=modelName)
-        openai_wrapper = models_dict[modelName]
+        openai_wrapper = openai_middleware
         
         # Generate response using the Observable
         response = openai_wrapper.generate(prompt=prompt, testing_freq = 1.0)

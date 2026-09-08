@@ -16,15 +16,6 @@ from huggingface_hub import login, InferenceClient
 
 from ..metrics import evaluate_metrics, MetricContext, is_evaluation_active
 
-# Configure logging
-# TODO: Create a threshold of changes for relevance before adding to log to prevent file bloat.
-# Currently logs even when insignificant changes are happening (1 change detected per second)
-# logging.basicConfig(
-#     filename="gemini_calls.log",
-#     level=logging.INFO,
-#     format="%(asctime)s | %(levelname)s | %(message)s",
-# )
-
 class Observable:
     """
     Class Observable can be instanced in a module where it is imported such that:
@@ -67,7 +58,7 @@ class Observable:
                  api_key: str | None = None, access_type: str = "api_key",                                          # API key access parameters
                  token_url: str | None = None, client_id: str | None = None, client_secret: str | None = None,      # API token access parameters
                  testing_freq: float = 0.1, provider_options: dict | None = None,                                   # User customization options
-                 id_gen: Callable[[], object] = uuid.uuid4
+                 id_gen: Callable[[], object] | None = None,
                  ):
         # Immediately checks for errors in given params, continues if all is well.
         if access_type == "api_key" and api_key is None:
@@ -166,9 +157,10 @@ class Observable:
         if provider_options is None:
             provider_options = self.provider_options
 
-        # Generate a unique id using the given function if it is a function
+        # Leave id generation to metrics.py if no value was provided
         if id is None:
-            id = self.id_gen
+            id = self.id_gen 
+            # If nothing was provided on init id remains None and is handled by metrics.py
         if callable(id):
             id = id()
 
@@ -248,7 +240,7 @@ class Observable:
                 model=self.model_name,
                 embed_function=self.embed
             )
-            evaluate_metrics(id=id, context=context, metadata=metadata) if not is_evaluation_active() else None
+            evaluate_metrics(context=context, id=id, metadata=metadata) if not is_evaluation_active() else None
             if return_context:
                 return response_text, context
             return response_text
@@ -265,7 +257,7 @@ class Observable:
                 model=self.model_name,
                 embed_function=self.embed
             )
-            evaluate_metrics(id=id, context=context, metadata=metadata) if not is_evaluation_active() else None
+            evaluate_metrics(context=context, id=id, metadata=metadata) if not is_evaluation_active() else None
             raise Exception(f"Failure to reach model within Community Observer. Exception: {e}")
 
     # TODO: 0.5.0 Review, implement, and add to __init__

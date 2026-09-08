@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ai-community-observer"
-version = "0.4.2"
+version = "0.4.5"
 description = "A tool for autonomously observing and analyzing AI applications"
 readme = "README.md"
 requires-python = ">=3.8"

@@ -3,10 +3,18 @@ from collections.abc import Iterable, Callable
 from pathlib import Path
 import uuid
 
-LOG_FILE = Path("metrics_log.jsonl")
-ENABLED_METRICS = None  # Set of metric names that are enabled for recording and storage. By default, all registered metrics are enabled.
-METRIC_ORDER = None
+LOG_FILE = Path("metrics_log.jsonl") # Default file path
+ID_GEN = uuid.uuid4                  # Default callable
+METRIC_SCHEMA = {                    # Default schema
+            "prompt": str,
+            "response": str,
+            "model": str,
+            "metrics": dict,
+            "metadata": object,
+        }
 
+ENABLED_METRICS = None               # Set of metric names that are enabled for recording and storage. By default, all registered metrics are enabled.
+METRIC_ORDER = None
 
 def _default_metric_order(metrics):
     """Return metrics sorted alphabetically by their configured metric names."""
@@ -23,7 +31,30 @@ def set_log_file(path: str = "metrics_log.jsonl") -> None:
 def get_log_file() -> Path:
     return LOG_FILE
 
-# ========================================================= ID CONFIG ========================================================= TODO
+# ========================================================= ID CONFIG ==============================================================
+
+def set_id_gen(id_gen: Callable) -> None:
+    """Set the id generation function. Default is uuid.uuid4. This setting in config will still be overwritten if values are set in Observable/Observer init."""
+    global ID_GEN
+    ID_GEN = id_gen
+    return None
+
+def get_id_gen() -> Callable:
+    return ID_GEN
+
+# ========================================================= METRIC SCHEMA CONFIG ===================================================
+
+def get_metric_schema() -> dict:
+    return METRIC_SCHEMA
+
+def set_metric_schema(schema: dict) -> None:
+    """
+    Set the schema for outputting metrics on Observable/Observer calls.
+    Beware changing this, as the schema can be quite fiddly without the required keys.
+    """
+    global METRIC_SCHEMA
+    METRIC_SCHEMA = schema
+    return None
 
 # ========================================================= METRICS CONFIG =========================================================
 def set_enabled_metrics(metric_names: Iterable | None = None) -> None:
