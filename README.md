@@ -5,7 +5,7 @@ an automated metric gathering platform all in one.
 
 It sits between your application and model calls, automatically collecting and evaluating inputs without changing how you generate or store prompt and response history. Just include the AICommunityObserver in your application and access the Observer or Observable objects to make your API calls, and centralize all of your AI operations to allow unified monitoring, alerting, security, and accessibility management for all GenAI assets within your application.
 
-By default, AICO does not persist prompt/response text in metric records. Set maintain_privacy=False only when storing the underlying text is appropriate for your application and data-handling requirements. Otherwise, store the prompt str you pass to generate() and 
+By default, AICO does not persist prompt/response text in metric records. Set maintain_privacy=False only when storing the underlying text is appropriate for your application and data-handling requirements. Otherwise, store the prompt str you pass to generate() and the generated response however you choose.
 
 ---
 ## Installation
@@ -63,38 +63,6 @@ Researchers extend the framework simply by adding additional metric plugins.
 
 ## Configuration
 ### Observable
-```python
-"""
-    Class Observable can be instanced in a module where it is imported such that:
-        - The type of model access can be specified for that instance (default API key) if given a key or access token. Options:
-            - "api_key" which requires
-                - api_key: str
-                - Supports: Gemini, OpenAI, HuggingFace models
-            - "api_token" which requires
-                - token_url: str
-                - client_id: str
-                - client_secret: str
-                - For: Custom API endpoints
-        - "provider" The type of model a.k.a. the provider
-        - "model_name" The name of the model (default gemini-3.5-flash). Current options: Gemini, OpenAI, HuggingFace.
-        - "testing_freq" A float representing the percentage of calls using this object which will have run tests. Default: 0.1 a.k.a 10%
-        - "id_gen" A Callable (function) responsible for id handling. Default: uuid4
-        - "provider_options" A dict representing the fine-tuning kwargs passed to provider. E.g.
-           provider_options_example={
-               "client": {
-                   "enterprise": True,
-                   "project": "...",
-                   "location": "...",
-               },
-               "generate": {
-                   "temperature": 0.8,
-                   "top_p": 0.95,
-               }
-           }
-
-    and the generate function can be called on that instance such that it will prompt the defined model in that instance with a given str.
-"""
-```
 Observable's generate() function only requires a prompt, and will auto-populate with any default options defined when initializing the Observable.
 
 For special cases it can also take provider option kwargs such as 

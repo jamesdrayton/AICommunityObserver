@@ -24,11 +24,12 @@ classifiers = [
 ]
 dependencies = [
   "google-genai>=2.10.0",
-  "openai>=2.45.0",
-  "huggingface-hub>=0.4.0",
-  "scikit-learn>=1.6.1",
   "httpx>=0.28.1",
+  "huggingface-hub>=0.4.0",
+  "numpy>=2.4.1",
+  "openai>=2.45.0",
   "python-dotenv>=1.0.0",
+  "scikit-learn>=1.6.1",
 ]
 license-files = ["LICEN[CS]E*"]
 
