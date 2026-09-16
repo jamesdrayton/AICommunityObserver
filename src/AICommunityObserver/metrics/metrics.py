@@ -63,7 +63,9 @@ def is_evaluation_active() -> bool:
 # Takes in the prompt, response, latency, and other relevant info and evaluates all registered metrics. Adds to log_history and returns results.
 # Should be called once per prompt-response pair, and each call should have exactly one distinct corresponding context object, which is paired with a unique id.
 def evaluate_metrics(context: MetricContext, id: Callable[[], object] | int | str | None = None, metadata: dict | None = None):
+    start_time = time.time()
 
+    # metadata will always exist and have a value for maintain_privacy (NOTE: Insert other default values here)
     if metadata is None:
         metadata = {"maintain_privacy" : True}
     elif metadata.get("maintain_privacy") == None:
@@ -116,6 +118,10 @@ def evaluate_metrics(context: MetricContext, id: Callable[[], object] | int | st
                 print(f"Metric plugin failed: {metric_func.__name__} -> {e}")
     finally:
         _evaluation_active.reset(token)
+
+    # Save total evaluation time to metadata before saving to logs
+    duration = time.time() - start_time
+    info["metadata"]["evaluation_time"] = duration
 
     # Remove prompt and response from info before saving as metrics. Important for data privacy and storage.
     # Optionally disabled in metadata for storage together. Recommended to instead log prompt-response pairs separately from metrics.

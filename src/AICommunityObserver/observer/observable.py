@@ -14,7 +14,8 @@ from openai import OpenAI
 from huggingface_hub import login, InferenceClient
 # from unsloth import FastLanguageModel
 
-from ..metrics import evaluate_metrics, MetricContext, is_evaluation_active
+from ..metrics import evaluate_metrics, MetricContext, is_evaluation_active, get_id_gen
+from .observer import Observer
 
 class Observable:
     """
@@ -52,13 +53,37 @@ class Observable:
     def _detect_hardware(self):
         # TODO: Either automate or move to user config.
         return
+
+    # Helper function to detect the appropriate embedding model
+    def _get_embedding_model(self) -> str:
+        # provider = self.provider
+        # model_name = self.model_name
+
+        # provider_defaults = {
+        #     "openai": "text-embedding-3-small",
+        #     "google": "gemini-embedding-001",
+        #     "gemini": "gemini-embedding-001",
+        #     "cohere": "embed-english-v3.0",
+        #     "voyage": "voyage-3",
+        # }
+
+        # if provider in provider_defaults.keys():
+        #     embedding_model = provider_defaults[provider]
+        #     print(f"Selecting for {provider}'s embedding model: {embedding_model}")
+        #     return embedding_model
+
+        # for prov, default_model in provider_defaults.items():
+        #     if prov in model_name:
+        #         return default_model
+
+        return "gemini-embedding-001" #TODO: Pair this with a queryable map of models to embedding models. Automate updates to that map elsewhere.
     
     # Init will instantiate the instance as usual, and check if all of the necessary parameters are present for the stated access type
     def __init__(self, provider: str = "google", model_name: str = "gemini-3.5-flash",                              # Basic essential parameters
                  api_key: str | None = None, access_type: str = "api_key",                                          # API key access parameters
                  token_url: str | None = None, client_id: str | None = None, client_secret: str | None = None,      # API token access parameters
                  testing_freq: float = 0.1, provider_options: dict | None = None,                                   # User customization options
-                 id_gen: Callable[[], object] | None = None,
+                 id_gen: Callable[[], object] | None = None, embedding_model: str | None = None
                  ):
         # Immediately checks for errors in given params, continues if all is well.
         if access_type == "api_key" and api_key is None:
@@ -70,14 +95,14 @@ class Observable:
         self.access_type = access_type.lower()
         self.provider = provider.lower()
         self.model_name = model_name.lower()
-        self.embedding_model = "gemini-embedding-001" # TODO: Choose embedding model with a function
+        self.embedding_model = embedding_model or self._get_embedding_model() # "gemini-embedding-001"
         self.api_key = api_key
         self.SCOPE = "api"
         self.token_cache = {"access_token": None, "expires_at": 0}
 
         # Define wrapper configuration constants
         self.testing_freq = testing_freq
-        self.id_gen = id_gen
+        self.id_gen = id_gen or get_id_gen()
         self.provider_options = provider_options
 
         if provider_options is None:
@@ -116,6 +141,14 @@ class Observable:
             self.CLIENT_ID = client_id
             self.CLIENT_SECRET = client_secret
 
+        self.observer = Observer(
+            provider=self.provider, 
+            model_name=self.model_name, 
+            embed_function=self.embed, 
+            testing_freq=self.testing_freq,
+            id_gen=self.id_gen
+            )
+
     # =================================================================== General api_token access ==============================================================================
 
     # Purpose: call to get an access token from the API
@@ -142,7 +175,9 @@ class Observable:
     # TODO: Make work with access_type: api_token as well as access_type: api_key
     # generate is the main point of access for instances of this class
     # generate must take a prompt or list of prompts, and it passes the prompt to the instance's chosen model
-    def generate(self, prompt: str | list, max_tokens: int = 256, temperature: float = 1.0, 
+    # If prompt is a str it is assumed to be a single user message without a chat history.
+    # If prompt is a list it is assumed to be a prompt and the chat history preceding it, where the first object is the oldest message.
+    def generate(self, prompt: str | list, max_tokens: int = 2048, temperature: float = 1.0, 
                        testing_freq: float | int | None = None, do_tests: bool | None = None,
                        metadata: dict | None = None, provider_options: dict | None = None, 
                        url: str = "", headers = None, body = None,                                        # Leftover from api_token options
@@ -169,21 +204,21 @@ class Observable:
             testing_freq = self.testing_freq
         testing_freq = float(testing_freq)            
 
-        # Generate unique log ID based on start time
+        # Start timer before the text generation api call
         start_time = time.time()
 
         # ========== Try making the call to the respective model with the given prompt ==========
-        # TODO: 0.5.0 Switch to batch generation function here if prompt is a list (and/or make it an option)
+        # TODO: 0.5.0 validate formatting for model given str or list
         try:
             # Point of difference for api_key vs api_token access type
             if self.access_type == "api_key":
-                generate_kwargs = provider_options.get("generate", {})
+                generate_kwargs = provider_options.get("generate", {}).copy()
                 generate_kwargs["temperature"] = generate_kwargs.get("temperature", temperature)
                 generate_kwargs["max_tokens"] = generate_kwargs.get("max_tokens", max_tokens)
                 # Handle different model types
+                # TODO: Create provider adapter abstractions to validate kwargs etc.
                 if self.provider == "google":
-                    generate_kwargs.pop("max_tokens")
-                    generate_kwargs["max_output_tokens"] = generate_kwargs.get("max_tokens", max_tokens)
+                    generate_kwargs["max_output_tokens"] = generate_kwargs.pop("max_tokens")
                     response = self.model.models.generate_content(
                         model=self.model_name,
                         contents=prompt,
@@ -194,13 +229,21 @@ class Observable:
                     response_text = response.text.strip()
 
                 elif self.provider == "openai":
-                    # TODO: verify openai kwarg names
-                    response = self.model.chat.completions.create( #type: ignore
+                    # responses api
+                    generate_kwargs["max_output_tokens"] = generate_kwargs.pop("max_tokens")
+                    response = self.model.responses.create(
                         model=self.model_name,
-                        messages=[{"role": "user", "content": prompt}],
-                        **generate_kwargs,
+                        input=prompt,
+                        **generate_kwargs
                     )
-                    response_text = response.choices[0].message.content.strip()
+                    response_text = response.output_text.strip()
+                    # completions api
+                    # response = self.model.responses.create(
+                    #     model=self.model_name,
+                    #     messages=[{"role": "user", "content": prompt}],
+                    #     **generate_kwargs,
+                    # )
+                    # response_text = response.choices[0].message.content.strip()
 
                 elif self.provider == "huggingface":
                     response = self.model.text_generation(
@@ -216,7 +259,7 @@ class Observable:
 
             duration = time.time() - start_time
 
-            metadata["latency"] = duration
+            metadata["response_time"] = duration
             metadata["tokens_used"] = response.usage_metadata.total_token_count if hasattr(response, "usage_metadata") else 999999 # Flag for missing token usage data
             # TODO: Log or raise an error if tokens_used exceeds max_tokens
             metadata["embedding_model"] = self.embedding_model
@@ -225,11 +268,10 @@ class Observable:
             # ========== Call evaluate_metrics to implement the observability aspect ==========
 
             # do_tests bool overrides other params
-            if do_tests:
-                metadata["do_tests"] = True
+            if do_tests is not None:
+                metadata["do_tests"] = do_tests
             else:
                 # Only evaluate some percentage of the time with self.testing_freq
-                random.seed(1443)
                 metadata["do_tests"] = (random.random() < testing_freq)
 
             context = MetricContext(
@@ -271,23 +313,6 @@ class Observable:
                        return_context: bool = False, id: int | str | Callable[[], object] | None = None):
         responses = []
         contexts = []
-        for prompt in prompts:
-            response, context = self.generate(
-                prompt=prompt,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                testing_freq=testing_freq,
-                do_tests=do_tests,
-                metadata=metadata,
-                provider_options=provider_options,
-                url=url,
-                headers=headers,
-                body=body,
-                return_context=True,
-                id=id
-            )
-            responses.append(response)
-            contexts.append(context)
         
         if return_context:
             return responses, contexts

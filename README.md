@@ -235,11 +235,14 @@ Automated metrics registry.
 Config options for testing frequency, logging location, metric ordering.
 
 v0.5.0
-Batched & cached options for generation + embedding. 
+Create the Observer class to run evaluate_metrics on prompt-response pairs
+Create a generic provider adapter model
+-> Batched & cached options for generation + embedding. 
 Namespace governance functionality (detect and sort metric namespaces on initialization).
-Config options for ID, namespace governance, and output data logging schema.
+-> Config options for ID, namespace governance, and output data logging schema.
+-> Asynchronous metric evaluation using the named requirements + ContextVars
 Collect addition of all baseline metric tests as default in the plugins dir alongside an added place to keep experimental ideas from research papers.
-Add support for more LLM providers.
+Add support for more LLM providers
 Verify api access token support.
 
 v0.6.0
@@ -247,15 +250,15 @@ v0.6.0
 `testing` addition to automate environment/application compatibility tests.
 `benchmarks` addition for metric test variants for benchmarking. Specific variants allow running benchmarks from datasets using AICO infrastructure.
 
-v0.7.0
+v???
+Select embedding models according to chosen model and provider on Observable initialization
+[project.entry-points."aicommunityobserver.metrics"] endpoint utilization (auto-registering external plugins)
+
 Expansion of namespace governance and benchmarks to cover cross-industry testing organized into directories (e.g. benchmarks/corruption/mining).
 Add infrastructure for GDPA compliant data sharing on cross-industry metric effectiveness.
 Enable automated testing for cross-industry task, model, and procedure comparisons.
 
-v???
 Explicitly enable metrics beyond single prompt-responses (e.g. conversation history)
-Select embedding models according to chosen model and provieder on Observable initialization
-[project.entry-points."aicommunityobserver.metrics"] endpoint utilization (auto-registering external plugins)
 MCP-specific integration. Support local or server-side testing.
 Agent/Model harness monitoring.
 Local model loading with hardware detection. 

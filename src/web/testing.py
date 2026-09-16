@@ -6,7 +6,6 @@ from .env import get_env_variable
 import asyncio
 import time
 import random
-import pandas as pd
 
 router = APIRouter()
 

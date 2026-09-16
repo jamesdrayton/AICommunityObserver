@@ -9,14 +9,14 @@ def compute_cosine_similarity(context):
     """
     Compute cosine similarity between prompt and response embeddings.
 
-    Expects the record to contain 'prompt_embedding' and 'response_embedding' fields,
+    Expects the context to contain 'prompt_embedding' and 'response_embedding' fields,
     which should be lists of floats representing the respective embeddings.
 
     Args:
-        record: dict containing 'prompt_embedding' and 'response_embedding'
+        context: MetricContext object containing 'prompt_embedding' and 'response_embedding'
 
     Returns:
-        Cosine similarity score between -1 and 1
+        Cosine similarity score between 0 and 1
     """
     if not context.prompt or not context.response:
         return None
